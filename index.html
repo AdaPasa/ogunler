@@ -224,6 +224,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         </div>
       </div>
       <button class="ob-next" onclick="obNext(1)">Devam →</button>
+      <button onclick="obGeri(0)" style="width:100%;margin-top:8px;padding:12px;border:1px solid var(--border);border-radius:14px;background:transparent;color:var(--sub);font-size:14px;cursor:pointer">← Geri</button>
     </div>
     <!-- Adım 2 -->
     <div class="ob-step" id="obs-2">
@@ -234,6 +235,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="ob-field"><label>Boy (cm)</label><input class="ob-input" id="ob-boy" type="number" placeholder="örn: 175"></div>
       <div class="ob-field"><label>Şu anki kilo (kg)</label><input class="ob-input" id="ob-kilo" type="number" placeholder="örn: 90"></div>
       <button class="ob-next" onclick="obNext(2)">Devam →</button>
+      <button onclick="obGeri(1)" style="width:100%;margin-top:8px;padding:12px;border:1px solid var(--border);border-radius:14px;background:transparent;color:var(--sub);font-size:14px;cursor:pointer">← Geri</button>
     </div>
     <!-- Adım 3 -->
     <div class="ob-step" id="obs-3">
@@ -255,6 +257,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         </div>
       </div>
       <button class="ob-next" onclick="obNext(3)">Devam →</button>
+      <button onclick="obGeri(2)" style="width:100%;margin-top:8px;padding:12px;border:1px solid var(--border);border-radius:14px;background:transparent;color:var(--sub);font-size:14px;cursor:pointer">← Geri</button>
     </div>
     <!-- Adım 4 -->
     <div class="ob-step" id="obs-4">
@@ -264,6 +267,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="ob-field"><label>Hedef kilo (kg)</label><input class="ob-input" id="ob-hkilo" type="number" placeholder="örn: 75"></div>
       <div class="ob-result" id="ob-result"></div>
       <button class="ob-next" onclick="obBitir()">Başlayalım! 🚀</button>
+      <button onclick="obGeri(3)" style="width:100%;margin-top:8px;padding:12px;border:1px solid var(--border);border-radius:14px;background:transparent;color:var(--sub);font-size:14px;cursor:pointer">← Geri</button>
     </div>
   </div>
 </div>
@@ -406,6 +410,12 @@ async function obGoogleGiris(){
     status.innerHTML=`<span style="color:var(--red)">${msg}</span>`;
     btn.disabled=false;btn.style.opacity='1';
   }
+}
+
+function obGeri(hedefAdim){
+  document.querySelectorAll('.ob-step').forEach(s=>s.classList.remove('active'));
+  document.getElementById(`obs-${hedefAdim}`).classList.add('active');
+  obProg(hedefAdim);
 }
 
 function obGirisAtla(){
