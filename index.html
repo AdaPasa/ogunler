@@ -216,8 +216,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .su-takviye-blok{border-top:1px solid var(--border);margin-top:4px;padding-top:12px;display:flex;flex-direction:column;gap:10px}
 .su-row{display:flex;align-items:center;gap:10px}
 .su-lbl{font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px}
-.su-bardaklar{display:flex;gap:5px;flex-wrap:wrap;flex:1}
-.su-bardak{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--border);background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all 0.15s;filter:grayscale(1);opacity:0.4}
+.su-bardaklar{display:flex;gap:5px;flex-wrap:wrap;flex:1}.su-bardak{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--border);background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all 0.15s;filter:grayscale(1);opacity:0.4}
 .su-bardak.dolu{background:rgba(55,138,221,0.2);border-color:var(--blue);filter:grayscale(0);opacity:1}
 .takviye-baslik{font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px}
 .takviye-liste{display:flex;flex-direction:column;gap:5px}
@@ -229,7 +228,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .takviye-ekle-btn{display:flex;align-items:center;gap:4px;padding:5px 10px;font-size:12px;color:var(--blue);background:rgba(55,138,221,0.1);border:1px dashed rgba(55,138,221,0.4);border-radius:9px;cursor:pointer;width:fit-content;font-weight:600;margin-top:2px}
 
 /* Takviye grid */
-.takviye-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.takviye-grid{display:grid;grid-template-columns:1fr;gap:6px;margin-top:8px}
+@media(min-width:480px){.takviye-grid{grid-template-columns:1fr 1fr}}
 .takviye-kart{background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:6px;transition:border-color 0.2s}
 .takviye-kart.aktif{border-color:var(--green);background:rgba(29,158,117,0.07)}
 .takviye-kart-sol{display:flex;align-items:center;gap:8px}
@@ -329,7 +329,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="tab-page active" id="page-ogunler">
       <div class="header">
         <div class="header-row">
-          <div class="app-title">🥗 <span id="h-isim">Öğün Takip</span></div>
+          <div class="app-title"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:6px"><path d="M12 2C8.5 2 6 4.5 6 7c0 2 1 3.5 2.5 4.5L8 20h8l-.5-8.5C17 10.5 18 9 18 7c0-2.5-2.5-5-6-5z" fill="#1D9E75" opacity="0.9"/><path d="M9 7c0-1.7 1.3-3 3-3" stroke="#5DCAA5" stroke-width="1.5" stroke-linecap="round"/><ellipse cx="12" cy="20.5" rx="4" ry="1" fill="#0F6E56" opacity="0.4"/></svg><span id="h-isim">Öğün Takip</span></div>
           <div class="streak" id="streak">🔥 0 gün</div>
         </div>
         <div style="display:flex;align-items:center;justify-content:flex-end;margin-top:8px">
@@ -424,6 +424,9 @@ let profil=JSON.parse(localStorage.getItem('profil')||'null');
 let gunlukHedef=parseInt(localStorage.getItem('kaloriH')||'2000');
 let makroH=JSON.parse(localStorage.getItem('makroH')||'{"p":150,"k":200,"y":65}');
 let gunKilolar=JSON.parse(localStorage.getItem('gunKilolar')||'{}');
+let favoriler=JSON.parse(localStorage.getItem('favoriler')||'[]');
+function saveFav(){localStorage.setItem('favoriler',JSON.stringify(favoriler));if(currentUser)fbWrite('profil',{profil,gunlukHedef,makroH,gunKilolar,suHedefi,favoriler});}
+function favToggle(bIdx){const i=favoriler.indexOf(bIdx);if(i>=0)favoriler.splice(i,1);else favoriler.push(bIdx);saveFav();yFiltrele(document.getElementById('yemek-ara')?.value||'');}
 
 function save(){try{localStorage.setItem('ogunler',JSON.stringify(data));}catch(e){}}
 function saveP(){localStorage.setItem('profil',JSON.stringify(profil));}
@@ -727,13 +730,40 @@ function yModalAc(di,mi,idx){
 function yFiltrele(q){
   const liste=document.getElementById('yemek-liste');if(!liste)return;
   const filt=q.trim().toLowerCase();
-  const sonuc=BESINLER.filter(b=>b.isimler.some(i=>i.includes(filt)));
+  const favSonuc=BESINLER.filter((b,i)=>favoriler.includes(i)&&(filt===''||b.isimler.some(s=>s.includes(filt))));
+  const diger=BESINLER.filter((b,i)=>!favoriler.includes(i)&&(filt===''||b.isimler.some(s=>s.includes(filt))));
+  const sonuc=[...favSonuc,...diger];
   if(sonuc.length===0){liste.innerHTML='<div style="text-align:center;color:var(--sub);padding:1rem;font-size:13px">Bulunamadı</div>';return;}
-  liste.innerHTML=sonuc.map((b,i)=>`
-    <div class="yemek-item" id="yi-${i}" onclick="ySecBesini(${BESINLER.indexOf(b)})">
-      <div class="yemek-item-isim">${b.isimler[0].charAt(0).toUpperCase()+b.isimler[0].slice(1)}</div>
-      <div class="yemek-item-birim">${b.birim==='gram'?'gram bazlı':b.birim==='ml'?'ml bazlı':'adet bazlı'} · ${b.birim==='adet'?b.kcal+' kcal/adet':Math.round(b.kcal*100)+' kcal/100'+b.birim}</div>
-    </div>`).join('');
+
+  let html='';
+  if(favSonuc.length>0&&filt===''){
+    html+=`<div style="font-size:10px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.5px;padding:4px 2px">⭐ Favoriler</div>`;
+  }
+  html+=favSonuc.map(b=>{
+    const bIdx=BESINLER.indexOf(b);
+    return`<div class="yemek-item" onclick="ySecBesini(${bIdx})">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div><div class="yemek-item-isim">${b.isimler[0].charAt(0).toUpperCase()+b.isimler[0].slice(1)}</div>
+        <div class="yemek-item-birim">${b.birim==='gram'?'gram bazlı':b.birim==='ml'?'ml bazlı':'adet bazlı'} · ${b.birim==='adet'?b.kcal+' kcal/adet':Math.round(b.kcal*100)+' kcal/100'+b.birim}</div></div>
+        <button onclick="event.stopPropagation();favToggle(${bIdx})" style="background:none;border:none;font-size:16px;cursor:pointer;padding:4px">⭐</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  if(diger.length>0&&favSonuc.length>0&&filt===''){
+    html+=`<div style="font-size:10px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:0.5px;padding:4px 2px;margin-top:4px">Tümü</div>`;
+  }
+  html+=diger.map(b=>{
+    const bIdx=BESINLER.indexOf(b);
+    return`<div class="yemek-item" onclick="ySecBesini(${bIdx})">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div><div class="yemek-item-isim">${b.isimler[0].charAt(0).toUpperCase()+b.isimler[0].slice(1)}</div>
+        <div class="yemek-item-birim">${b.birim==='gram'?'gram bazlı':b.birim==='ml'?'ml bazlı':'adet bazlı'} · ${b.birim==='adet'?b.kcal+' kcal/adet':Math.round(b.kcal*100)+' kcal/100'+b.birim}</div></div>
+        <button onclick="event.stopPropagation();favToggle(${bIdx})" style="background:none;border:none;font-size:16px;cursor:pointer;padding:4px;opacity:0.4">☆</button>
+      </div>
+    </div>`;
+  }).join('');
+  liste.innerHTML=html;
 }
 
 function ySecBesini(idx){
@@ -1004,7 +1034,8 @@ function renderSuTakviye(di){
   const toplamMl=d.suMl||0;
   const bardakDolu=Math.min(8,Math.round(toplamMl/250));
   const yuzde=Math.min(100,Math.round(toplamMl/2000*100));
-  const bardaklar=Array.from({length:8},(_,i)=>`<div class="su-bardak${i<bardakDolu?' dolu':''}" onclick="suToggle(${di},${i})">🥛</div>`).join('');
+  const toplamBardak=Math.max(4,Math.ceil(suHedefi/250));
+  const bardaklar=Array.from({length:toplamBardak},(_,i)=>`<div class="su-bardak${i<bardakDolu?' dolu':''}" onclick="suToggle(${di},${i})">🥛</div>`).join('');
 
   const takvGrid=TAKVIYELER.map((t,ti)=>{
     const adet=d.takviyeler[ti]||0;
@@ -1036,10 +1067,10 @@ function renderSuTakviye(di){
           <div style="height:100%;width:${Math.min(100,Math.round(toplamMl/suHedefi*100))}%;background:var(--blue);border-radius:99px;transition:width 0.4s"></div>
         </div>
         <div class="su-bardaklar" style="margin-bottom:8px">${bardaklar}</div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <input id="su-ml-inp-${di}" type="number" min="1" placeholder="ml gir (örn: 1500)" style="flex:1;border:1px solid var(--border);border-radius:9px;padding:7px 10px;font-size:13px;background:var(--card2);color:var(--text);outline:none" onkeydown="suMlKeydown(event,${di})">
-          <button onclick="suMlGir(${di})" style="padding:7px 16px;border:none;border-radius:9px;background:var(--blue);color:#fff;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">Ekle</button>
-          ${toplamMl>0?`<button onclick="suSifirla(${di})" style="padding:7px 10px;border:1px solid var(--border);border-radius:9px;background:transparent;color:var(--sub);font-size:12px;cursor:pointer">Sıfırla</button>`:''}
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <input id="su-ml-inp-${di}" type="number" min="1" placeholder="ml gir (örn: 1500)" style="flex:1;min-width:120px;border:1px solid var(--border);border-radius:9px;padding:7px 10px;font-size:13px;background:var(--card2);color:var(--text);outline:none" onkeydown="suMlKeydown(event,${di})">
+          <button onclick="suMlGir(${di})" style="padding:7px 14px;border:none;border-radius:9px;background:var(--blue);color:#fff;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">Ekle</button>
+          ${toplamMl>0?`<button onclick="suSifirla(${di})" style="padding:7px 10px;border:1px solid var(--border);border-radius:9px;background:transparent;color:var(--sub);font-size:12px;cursor:pointer;white-space:nowrap">Sıfırla</button>`:''}
         </div>
       </div>
       <!-- TAKVİYELER -->
@@ -1215,6 +1246,7 @@ async function syncFromFirebase(){
       if(pd.makroH){ makroH=pd.makroH; localStorage.setItem('makroH',JSON.stringify(makroH)); }
       if(pd.gunKilolar){ gunKilolar=pd.gunKilolar; localStorage.setItem('gunKilolar',JSON.stringify(gunKilolar)); }
       if(pd.suHedefi){ suHedefi=pd.suHedefi; localStorage.setItem('suHedefi',suHedefi); }
+      if(pd.favoriler){ favoriler=pd.favoriler; localStorage.setItem('favoriler',JSON.stringify(favoriler)); }
     }
 
     const dSnap = await ref('ogunler').get();
