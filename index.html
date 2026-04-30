@@ -449,64 +449,89 @@ function switchTab(name,btn){
 }
 
 // ── SİLUET (Gerçekçi SVG path) ──
-function getSiluetSVG(oran, color, w=80, h=130){
+function getSiluetSVG(oran, color, w=80, h=160){
   // oran: 0=obez, 1=fit
-  // Gerçekçi insan silueti — path koordinatları kiloya göre ölçekleniyor
-  const cx=w/2;
-  // Vücut genişlik çarpanı: obezde 1.0, fitte 0.62
-  const sc=1.0-oran*0.38;
+  // Sabit viewBox, sadece genişlik değerleri değişiyor
+  const vw=100, vh=220;
+  const cx=50;
+
+  // Kiloya göre genişlik çarpanı
+  const fat=1+((1-oran)*0.55); // obezde 1.55, fitte 1.0
+
+  // --- Sabit koordinatlar (fit vücut baseline) ---
   // Baş
-  const hr=w*0.13; const hy=h*0.09;
+  const headR=10, headCY=12;
   // Boyun
-  const nw=w*0.07*sc; const ny=h*0.17;
-  // Omuz
-  const sw=w*0.42*sc;
-  // Gövde waist
-  const ww=w*0.28*sc;
-  // Kalça
-  const hw2=w*0.40*sc;
-  // Bacak aralığı
-  const la=w*0.10*sc;
+  const neckW=6*fat*0.6, neckTop=22, neckBot=28;
+  // Omuz genişliği
+  const shoulderW=22*fat;
+  // Gövde
+  const chestW=18*fat;
+  const waistW=13*fat;
+  const hipW=20*fat;
+  const torsoTop=28, torsoBot=105;
+  const waistY=72;
+  // Kol
+  const armTopW=6*fat;
+  const armBotW=4*fat;
+  // Bacak
+  const legW=9*fat;
+  const legGap=3*fat*0.4;
 
-  const path=`
-M ${cx} ${h*0.02}
-m 0 0
-a ${hr} ${hr*1.1} 0 1 1 0.01 0
-Z
-M ${cx-nw} ${ny} L ${cx+nw} ${ny} L ${cx+nw} ${h*0.20} L ${cx-nw} ${h*0.20} Z
-M ${cx-sw} ${h*0.20}
-C ${cx-sw*1.15} ${h*0.25} ${cx-ww*1.1} ${h*0.38} ${cx-ww} ${h*0.50}
-C ${cx-hw2*0.9} ${h*0.62} ${cx-hw2} ${h*0.66} ${cx-hw2} ${h*0.68}
-L ${cx+hw2} ${h*0.68}
-C ${cx+hw2} ${h*0.66} ${cx+hw2*0.9} ${h*0.62} ${cx+ww} ${h*0.50}
-C ${cx+ww*1.1} ${h*0.38} ${cx+sw*1.15} ${h*0.25} ${cx+sw} ${h*0.20}
-C ${cx+sw*0.6} ${h*0.215} ${cx+nw} ${h*0.205} ${cx+nw} ${h*0.20}
-L ${cx-nw} ${h*0.20}
-C ${cx-nw} ${h*0.205} ${cx-sw*0.6} ${h*0.215} ${cx-sw} ${h*0.20}
-Z
-M ${cx-sw} ${h*0.21}
-C ${cx-sw*1.3} ${h*0.28} ${cx-sw*1.45*sc} ${h*0.42} ${cx-sw*1.2*sc} ${h*0.58}
-C ${cx-sw*1.1*sc} ${h*0.63} ${cx-sw*1.0*sc} ${h*0.65} ${cx-sw*0.95*sc} ${h*0.66}
-C ${cx-sw*0.85*sc} ${h*0.63} ${cx-sw*0.75*sc} ${h*0.58} ${cx-ww*1.05} ${h*0.50}
-Z
-M ${cx+sw} ${h*0.21}
-C ${cx+sw*1.3} ${h*0.28} ${cx+sw*1.45*sc} ${h*0.42} ${cx+sw*1.2*sc} ${h*0.58}
-C ${cx+sw*1.1*sc} ${h*0.63} ${cx+sw*1.0*sc} ${h*0.65} ${cx+sw*0.95*sc} ${h*0.66}
-C ${cx+sw*0.85*sc} ${h*0.63} ${cx+sw*0.75*sc} ${h*0.58} ${cx+ww*1.05} ${h*0.50}
-Z
-M ${cx-la*0.5} ${h*0.68}
-C ${cx-la*2.5*sc} ${h*0.74} ${cx-la*2.8*sc} ${h*0.80} ${cx-la*2.2*sc} ${h*0.90}
-C ${cx-la*1.8*sc} ${h*0.97} ${cx-la*1.5*sc} ${h*1.0} ${cx-la*0.5*sc} ${h*0.99}
-C ${cx-la*0.2*sc} ${h*0.99} ${cx} ${h*0.98} ${cx-la*0.1} ${h*0.68}
-Z
-M ${cx+la*0.5} ${h*0.68}
-C ${cx+la*2.5*sc} ${h*0.74} ${cx+la*2.8*sc} ${h*0.80} ${cx+la*2.2*sc} ${h*0.90}
-C ${cx+la*1.8*sc} ${h*0.97} ${cx+la*1.5*sc} ${h*1.0} ${cx+la*0.5*sc} ${h*0.99}
-C ${cx+la*0.2*sc} ${h*0.99} ${cx} ${h*0.98} ${cx+la*0.1} ${h*0.68}
-Z`;
+  const p=`
+    M ${cx} ${headCY-headR}
+    a ${headR*fat*0.85} ${headR} 0 1 1 0.01 0 Z
 
-  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
-    <path d="${path}" fill="${color}" style="filter:drop-shadow(0 0 6px ${color}60)"/>
+    M ${cx-neckW} ${neckTop}
+    L ${cx+neckW} ${neckTop}
+    L ${cx+neckW*1.1} ${neckBot}
+    L ${cx-neckW*1.1} ${neckBot} Z
+
+    M ${cx-shoulderW} ${torsoTop+2}
+    C ${cx-chestW*1.1} ${torsoTop+12} ${cx-waistW*1.05} ${waistY-5} ${cx-waistW} ${waistY}
+    C ${cx-hipW*0.95} ${waistY+18} ${cx-hipW} ${torsoBot-8} ${cx-hipW+1} ${torsoBot}
+    L ${cx+hipW-1} ${torsoBot}
+    C ${cx+hipW} ${torsoBot-8} ${cx+hipW*0.95} ${waistY+18} ${cx+waistW} ${waistY}
+    C ${cx+waistW*1.05} ${waistY-5} ${cx+chestW*1.1} ${torsoTop+12} ${cx+shoulderW} ${torsoTop+2}
+    C ${cx+shoulderW*0.6} ${torsoTop} ${cx+neckW*1.1} ${neckBot} ${cx+neckW*1.1} ${neckBot}
+    L ${cx-neckW*1.1} ${neckBot}
+    C ${cx-neckW*1.1} ${neckBot} ${cx-shoulderW*0.6} ${torsoTop} ${cx-shoulderW} ${torsoTop+2} Z
+
+    M ${cx-shoulderW+1} ${torsoTop+5}
+    C ${cx-shoulderW-8*fat} ${torsoTop+20} ${cx-shoulderW-10*fat} ${torsoTop+50} ${cx-shoulderW-6*fat} ${torsoTop+72}
+    C ${cx-shoulderW-4*fat} ${torsoTop+80} ${cx-shoulderW-1} ${torsoTop+84} ${cx-chestW+2} ${torsoTop+76}
+    C ${cx-chestW+4} ${torsoTop+65} ${cx-waistW*1.1} ${waistY+10} ${cx-waistW} ${waistY}
+    C ${cx-waistW*1.05} ${waistY-5} ${cx-chestW*1.1} ${torsoTop+12} ${cx-shoulderW+1} ${torsoTop+5} Z
+
+    M ${cx+shoulderW-1} ${torsoTop+5}
+    C ${cx+shoulderW+8*fat} ${torsoTop+20} ${cx+shoulderW+10*fat} ${torsoTop+50} ${cx+shoulderW+6*fat} ${torsoTop+72}
+    C ${cx+shoulderW+4*fat} ${torsoTop+80} ${cx+shoulderW+1} ${torsoTop+84} ${cx+chestW-2} ${torsoTop+76}
+    C ${cx+chestW-4} ${torsoTop+65} ${cx+waistW*1.1} ${waistY+10} ${cx+waistW} ${waistY}
+    C ${cx+waistW*1.05} ${waistY-5} ${cx+chestW*1.1} ${torsoTop+12} ${cx+shoulderW-1} ${torsoTop+5} Z
+
+    M ${cx-hipW+1} ${torsoBot}
+    C ${cx-hipW} ${torsoBot+5} ${cx-legGap-legW} ${torsoBot+10} ${cx-legGap-legW+1} ${torsoBot+30}
+    C ${cx-legGap-legW+1} ${torsoBot+60} ${cx-legGap-legW*0.85} ${torsoBot+80} ${cx-legGap-legW*0.7} ${vh-8}
+    C ${cx-legGap-legW*0.5} ${vh-4} ${cx-legGap-2} ${vh-2} ${cx-legGap} ${vh-2}
+    C ${cx-legGap+1} ${vh-2} ${cx-1} ${vh-1} ${cx-1} ${torsoBot+45}
+    C ${cx-1} ${torsoBot+15} ${cx-hipW*0.5} ${torsoBot+8} ${cx-hipW+1} ${torsoBot} Z
+
+    M ${cx+hipW-1} ${torsoBot}
+    C ${cx+hipW} ${torsoBot+5} ${cx+legGap+legW} ${torsoBot+10} ${cx+legGap+legW-1} ${torsoBot+30}
+    C ${cx+legGap+legW-1} ${torsoBot+60} ${cx+legGap+legW*0.85} ${torsoBot+80} ${cx+legGap+legW*0.7} ${vh-8}
+    C ${cx+legGap+legW*0.5} ${vh-4} ${cx+legGap+2} ${vh-2} ${cx+legGap} ${vh-2}
+    C ${cx+legGap-1} ${vh-2} ${cx+1} ${vh-1} ${cx+1} ${torsoBot+45}
+    C ${cx+1} ${torsoBot+15} ${cx+hipW*0.5} ${torsoBot+8} ${cx+hipW-1} ${torsoBot} Z
+  `;
+
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${vw} ${vh}" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="2" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <path d="${p}" fill="${color}" filter="url(#glow)"/>
   </svg>`;
 }
 
