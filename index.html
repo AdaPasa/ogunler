@@ -306,8 +306,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
           </div>
         </div>
 
-        <!-- Siluet -->
-        <div class="siluet-card" id="siluet-card"></div>
+        <!-- İlerleme kartı -->
+        <div class="card" id="ilerleme-card"></div>
 
         <!-- Haftalık ilerleme -->
         <div class="card">
@@ -557,32 +557,55 @@ function getOranColor(oran){
   return`rgb(${r},${g},80)`;
 }
 
-function renderSiluet(){
-  const el=document.getElementById('siluet-card');if(!el||!profil)return;
-  const kOran=getSiluetOran();
-  const mOran=getMealOran();
-  const total=Math.min(1,kOran*0.7+mOran*0.3);
-  const color=getOranColor(total);
+function renderIlerleme(){
+  const el=document.getElementById('ilerleme-card');if(!el||!profil)return;
   const bugun=new Date().toISOString().slice(0,10);
-  const mevcutKilo=gunKilolar[bugun]||profil.kilo;
-  const hKilo=profil.hKilo||profil.hedefKilo||profil.hkilo||profil.kilo;
-  const kalan=Math.max(0,(mevcutKilo-hKilo)).toFixed(1);
-  const yuzde=Math.round(Math.max(0,Math.min(100,kOran*100)));
-  const durum=total<0.3?'Obez':total<0.6?'Kilolu':total<0.85?'Normal':'Fit';
-  const durumColor=total<0.3?'#E24B4A':total<0.6?'#EF9F27':total<0.85?'#378ADD':'#1D9E75';
+  const baslangic=parseFloat(profil.kilo);
+  const hedef=parseFloat(profil.hKilo||profil.hedefKilo||profil.hkilo||baslangic);
+  const simdi=parseFloat(gunKilolar[bugun]||baslangic);
+  const toplamFark=Math.abs(baslangic-hedef);
+  const gidilenFark=Math.abs(baslangic-simdi);
+  const yuzde=toplamFark>0?Math.min(100,Math.round(gidilenFark/toplamFark*100)):0;
+  const kalan=Math.max(0,(simdi-hedef)).toFixed(1);
+  const kayip=(baslangic-simdi).toFixed(1);
+  const veriyorMu=hedef<baslangic;
+
+  // Emoji & renk
+  const emoji=yuzde<25?'🌱':yuzde<50?'💪':yuzde<75?'🔥':yuzde<100?'⚡':'🏆';
+  const color=yuzde<33?'var(--blue)':yuzde<66?'var(--orange)':'var(--green)';
 
   el.innerHTML=`
-    <div class="siluet-svg-area">
-      ${getSiluetSVG(total,color,80,130)}
-      <span class="siluet-label" style="background:${durumColor}22;color:${durumColor};border:1px solid ${durumColor}44">${durum}</span>
+    <div class="card-title">Kilo Hedefi İlerlemesi</div>
+    <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">
+      <div style="font-size:48px;line-height:1">${emoji}</div>
+      <div>
+        <div style="font-size:28px;font-weight:800;color:${color};letter-spacing:-1px">${yuzde}%</div>
+        <div style="font-size:12px;color:var(--sub)">hedefe ulaşıldı</div>
+      </div>
+      <div style="margin-left:auto;text-align:right">
+        <div style="font-size:20px;font-weight:800;color:#fff">${simdi} kg</div>
+        <div style="font-size:11px;color:var(--sub)">mevcut kilo</div>
+      </div>
     </div>
-    <div class="siluet-right">
-      <div class="siluet-name">${profil.isim}</div>
-      <div class="siluet-sub">Hedef: ${hKilo} kg • Kalan: ${kalan} kg</div>
-      <div class="siluet-stats">
-        <div class="sstat"><span class="sstat-lbl">Mevcut kilo</span><div class="sstat-right"><span class="sstat-val">${mevcutKilo} kg</span></div></div>
-        <div class="sstat"><span class="sstat-lbl">Bugün öğünler</span><div class="sstat-right"><div class="sstat-bar"><div class="sstat-fill" style="width:${mOran*100}%;background:var(--green)"></div></div><span class="sstat-val">${Math.round(mOran*3)}/3</span></div></div>
-        <div class="sstat"><span class="sstat-lbl">Hedefe ilerleme</span><div class="sstat-right"><div class="sstat-bar"><div class="sstat-fill" style="width:${yuzde}%;background:${color}"></div></div><span class="sstat-val">%${yuzde}</span></div></div>
+    <div style="background:var(--border);border-radius:99px;height:10px;overflow:hidden;margin-bottom:10px">
+      <div style="height:100%;width:${yuzde}%;background:linear-gradient(90deg,var(--blue),${color});border-radius:99px;transition:width 0.8s cubic-bezier(.4,0,.2,1)"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--sub);margin-bottom:1rem">
+      <span>Başlangıç: <b style="color:#fff">${baslangic} kg</b></span>
+      <span>Hedef: <b style="color:#fff">${hedef} kg</b></span>
+    </div>
+    <div style="display:flex;gap:8px">
+      <div style="flex:1;background:rgba(255,255,255,0.04);border-radius:11px;padding:10px;border:1px solid var(--border);text-align:center">
+        <div style="font-size:10px;color:var(--sub);font-weight:700;text-transform:uppercase;margin-bottom:4px">${veriyorMu?'Verilen':'Alınan'}</div>
+        <div style="font-size:18px;font-weight:800;color:var(--green)">${Math.abs(parseFloat(kayip))} kg</div>
+      </div>
+      <div style="flex:1;background:rgba(255,255,255,0.04);border-radius:11px;padding:10px;border:1px solid var(--border);text-align:center">
+        <div style="font-size:10px;color:var(--sub);font-weight:700;text-transform:uppercase;margin-bottom:4px">Kalan</div>
+        <div style="font-size:18px;font-weight:800;color:var(--orange)">${kalan} kg</div>
+      </div>
+      <div style="flex:1;background:rgba(255,255,255,0.04);border-radius:11px;padding:10px;border:1px solid var(--border);text-align:center">
+        <div style="font-size:10px;color:var(--sub);font-weight:700;text-transform:uppercase;margin-bottom:4px">Bugün öğün</div>
+        <div style="font-size:18px;font-weight:800;color:var(--blue)">${Math.round(getMealOran()*3)}/3</div>
       </div>
     </div>`;
 }
@@ -594,10 +617,16 @@ function showMealComplete(di,mi){
   const tam=MEALS.filter((_,m)=>!!st.meals?.[`${di}-${m}`]).length;
   const msgs=[{e:'☀️',t:'Kahvaltı tamam!',s:'Güne harika başladın! 💪'},{e:'🌤️',t:'Öğle tamam!',s:'Yarı yoldasın, devam et!'},{e:'🌙',t:'Akşam tamam!',s:'Günü tamamladın, muhteşem!'}];
   const msg=msgs[mi];
-  const kOran=getSiluetOran();const mOran=tam/3;const total=Math.min(1,kOran*0.7+mOran*0.3);const color=getOranColor(total);
   const ov=document.createElement('div');ov.className='mc-ov';
-  ov.innerHTML=`<div class="mc-card"><span class="mc-ico">${msg.e}</span><div class="mc-title">${msg.t}</div><div class="mc-sub">${msg.s}</div><div class="mc-siluet">${getSiluetSVG(total,color,90,145)}</div><div style="font-size:12px;color:var(--green);font-weight:700;margin-bottom:1rem">${tam}/3 öğün tamamlandı ✓</div><button class="mc-close" onclick="this.closest('.mc-ov').remove()">Harika! 💪</button></div>`;
-  document.body.appendChild(ov);setTimeout(()=>{if(ov.parentNode)ov.remove();},6000);
+  ov.innerHTML=`<div class="mc-card">
+    <span class="mc-ico">${msg.e}</span>
+    <div class="mc-title">${msg.t}</div>
+    <div class="mc-sub">${msg.s}</div>
+    <div style="font-size:48px;margin:1rem 0">${tam===1?'🥗':tam===2?'🥗🥗':'🥗🥗🥗'}</div>
+    <div style="font-size:13px;color:var(--green);font-weight:700;margin-bottom:1.25rem">${tam}/3 öğün tamamlandı ✓</div>
+    <button class="mc-close" onclick="this.closest('.mc-ov').remove()">Harika! 💪</button>
+  </div>`;
+  document.body.appendChild(ov);setTimeout(()=>{if(ov.parentNode)ov.remove();},5000);
 }
 
 // ── KALORİ VERİTABANI ──
@@ -713,7 +742,7 @@ function kalGuncelle(){
 
 // ── İSTATİSTİK ──
 function renderIstat(){
-  kalGuncelle();renderSiluet();
+  kalGuncelle();  renderIlerleme();
   const dates=getWeekDates(weekOffset);
   const today=new Date();today.setHours(0,0,0,0);
   let total=0,done=0,hkc=0,hp=0,hk=0,hyg=0;
