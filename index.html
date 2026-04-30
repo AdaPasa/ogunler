@@ -354,6 +354,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 </div>
 
+<!-- Firebase compat -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
 const DAYS=['Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi','Pazar'];
 const DAYS_S=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
@@ -390,8 +394,8 @@ async function obGoogleGiris(){
       btn.disabled=false;btn.style.opacity='1';
       return;
     }
-    const provider=new GoogleAuthProvider();
-    await signInWithPopup(auth,provider);
+    const provider=new firebase.auth.GoogleAuthProvider();
+    await auth.signInWithPopup(provider);
     // onAuthStateChanged zaten devralacak
   }catch(e){
     console.error('Google giriş hatası:',e);
@@ -842,33 +846,17 @@ const fbConfig={
 };
 
 let db=null, auth=null, currentUser=null;
-let GoogleAuthProvider, signInWithPopup, signOut;
-let setDoc, doc, getDoc, onSnapshot;
 
-async function initFirebase(){
+function initFirebase(){
   try{
-    const {initializeApp} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-    const fbApp = initializeApp(fbConfig); // ← fbApp düzeltildi
+    // compat API — firebase-*-compat.js scriptleri zaten yüklü
+    firebase.initializeApp(fbConfig);
+    db   = firebase.firestore();
+    auth = firebase.auth();
 
-    // Firestore
-    const fs = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    db = fs.getFirestore(fbApp);
-    setDoc = fs.setDoc;
-    doc = fs.doc;
-    getDoc = fs.getDoc;
-    onSnapshot = fs.onSnapshot;
-
-    // Auth
-    const fa = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-    auth = fa.getAuth(fbApp);
-    GoogleAuthProvider = fa.GoogleAuthProvider;
-    signInWithPopup = fa.signInWithPopup;
-    signOut = fa.signOut;
-
-    // Auth butonu bağla
     updateAuthUI();
 
-    fa.onAuthStateChanged(auth, async user => {
+    auth.onAuthStateChanged(async user => {
       if(user){
         currentUser = user;
         updateAuthUI();
@@ -876,7 +864,6 @@ async function initFirebase(){
       } else {
         currentUser = null;
         updateAuthUI();
-        // Giriş yok — local veriye bak
         if(profil) showApp();
         else showOnboarding();
       }
@@ -884,7 +871,6 @@ async function initFirebase(){
 
   }catch(e){
     console.error('Firebase yüklenemedi:', e);
-    // Firebase olmadan da çalış
     if(profil) showApp();
     else showOnboarding();
   }
@@ -897,9 +883,7 @@ function updateAuthUI(){
   if(currentUser){
     if(nameEl) nameEl.textContent = currentUser.displayName || currentUser.email || '';
     btn.textContent = 'Çıkış Yap';
-    btn.onclick = async () => {
-      try{ await signOut(auth); }catch(e){ console.error(e); }
-    };
+    btn.onclick = () => auth.signOut().catch(console.error);
   } else {
     if(nameEl) nameEl.textContent = '';
     btn.textContent = 'Google ile Giriş';
@@ -908,13 +892,13 @@ function updateAuthUI(){
 }
 
 async function googleGiris(){
-  if(!auth || !GoogleAuthProvider){
-    alert('Firebase henüz yüklenmedi, biraz bekle.');
+  if(!auth){
+    alert('Firebase henüz yüklenmedi.');
     return;
   }
   try{
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    const provider = new firebase.auth.GoogleAuthProvider();
+    await auth.signInWithPopup(provider);
   }catch(e){
     console.error('Giriş hatası:', e);
     let msg = 'Giriş başarısız.';
@@ -928,9 +912,10 @@ async function syncFromFirebase(){
   if(!currentUser || !db) return;
   try{
     const uid = currentUser.uid;
+    const ref  = (path) => db.collection('users').doc(uid).collection(path).doc('data');
 
-    const pSnap = await getDoc(doc(db,'users',uid,'profil','data'));
-    if(pSnap.exists()){
+    const pSnap = await ref('profil').get();
+    if(pSnap.exists){
       const pd = pSnap.data();
       if(pd.profil){ profil=pd.profil; saveP(); }
       if(pd.gunlukHedef){ gunlukHedef=pd.gunlukHedef; localStorage.setItem('kaloriH',gunlukHedef); }
@@ -938,15 +923,15 @@ async function syncFromFirebase(){
       if(pd.gunKilolar){ gunKilolar=pd.gunKilolar; localStorage.setItem('gunKilolar',JSON.stringify(gunKilolar)); }
     }
 
-    const dSnap = await getDoc(doc(db,'users',uid,'ogunler','data'));
-    if(dSnap.exists() && dSnap.data().data){ data=dSnap.data().data; save(); }
+    const dSnap = await ref('ogunler').get();
+    if(dSnap.exists && dSnap.data().data){ data=dSnap.data().data; save(); }
 
     // Gerçek zamanlı dinle
-    onSnapshot(doc(db,'users',uid,'ogunler','data'), snap=>{
-      if(snap.exists() && snap.data().data){ data=snap.data().data; save(); if(profil){ render(); renderIstat(); } }
+    ref('ogunler').onSnapshot(snap=>{
+      if(snap.exists && snap.data().data){ data=snap.data().data; save(); if(profil){ render(); renderIstat(); } }
     });
-    onSnapshot(doc(db,'users',uid,'profil','data'), snap=>{
-      if(snap.exists()){
+    ref('profil').onSnapshot(snap=>{
+      if(snap.exists){
         const pd = snap.data();
         if(pd.gunKilolar){ gunKilolar=pd.gunKilolar; localStorage.setItem('gunKilolar',JSON.stringify(gunKilolar)); renderIstat(); renderProfil(); }
       }
@@ -956,7 +941,6 @@ async function syncFromFirebase(){
 
   if(profil) showApp();
   else {
-    // Google girişi tamam ama profil yok — adım 1'e geç
     showOnboarding();
     document.getElementById('obs-0').classList.remove('active');
     document.getElementById('obs-1').classList.add('active');
@@ -968,7 +952,8 @@ async function syncFromFirebase(){
 
 function fbWrite(path, dat){
   if(!db || !currentUser) return;
-  setDoc(doc(db,'users',currentUser.uid, path,'data'), dat, {merge:true})
+  db.collection('users').doc(currentUser.uid).collection(path).doc('data')
+    .set(dat, {merge:true})
     .catch(e => console.error('FB write:', e));
 }
 
