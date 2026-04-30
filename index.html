@@ -144,21 +144,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .hmkart-lbl{font-size:10px;color:var(--sub);font-weight:600;text-transform:uppercase}
 .hmkart-val{font-size:16px;font-weight:800;margin-top:3px}
 
-/* Siluet kartı */
-.siluet-card{background:linear-gradient(135deg,#0a1628,#0d2418);border-radius:16px;padding:1.1rem;border:1px solid var(--border);display:flex;gap:1rem;align-items:center}
-.siluet-svg-area{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:8px}
-.siluet-label{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;text-align:center}
-.siluet-right{flex:1}
-.siluet-name{font-size:16px;font-weight:700;margin-bottom:3px}
-.siluet-sub{font-size:12px;color:var(--sub);margin-bottom:10px}
-.siluet-stats{display:flex;flex-direction:column;gap:7px}
-.sstat{display:flex;align-items:center;justify-content:space-between;font-size:12px}
-.sstat-lbl{color:var(--sub)}
-.sstat-right{display:flex;align-items:center;gap:6px}
-.sstat-bar{width:70px;height:4px;background:var(--border);border-radius:99px;overflow:hidden}
-.sstat-fill{height:100%;border-radius:99px;transition:width 0.8s}
-.sstat-val{font-weight:700;font-size:12px;min-width:36px;text-align:right}
-
 /* ── PROFİL ── */
 .profil-section{display:flex;flex-direction:column;gap:12px}
 .profil-kart{background:var(--card);border-radius:16px;padding:1.1rem;border:1px solid var(--border)}
@@ -190,7 +175,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 @keyframes bou{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
 .mc-title{font-size:20px;font-weight:800;color:#fff;margin-bottom:5px}
 .mc-sub{font-size:13px;color:var(--sub);margin-bottom:1.25rem}
-.mc-siluet{display:flex;justify-content:center;margin-bottom:1.25rem}
 .mc-close{width:100%;padding:13px;border:none;border-radius:11px;background:var(--green);color:#fff;font-size:15px;font-weight:700;cursor:pointer}
 
 /* ── GÜNLÜK KİLO MODAL ── */
@@ -202,6 +186,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .kilo-box input{width:100%;border:1.5px solid var(--border);border-radius:11px;padding:13px;font-size:22px;text-align:center;background:var(--card2);color:var(--text);outline:none;margin-bottom:1rem}
 .kilo-box input:focus{border-color:var(--green)}
 .kilo-box button{width:100%;padding:13px;border:none;border-radius:11px;background:var(--green);color:#fff;font-size:15px;font-weight:700;cursor:pointer}
+
+/* Giriş yükleniyor spinner */
+.auth-loading{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--sub);margin-top:1rem;justify-content:center}
+.spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin 0.7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -291,7 +280,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
           <span style="font-size:12px;color:rgba(255,255,255,0.5)" id="auth-name"></span>
-          <button id="auth-btn" onclick="googleGiris()" style="font-size:12px;font-weight:600;padding:5px 12px;border:1px solid rgba(255,255,255,0.25);border-radius:20px;background:rgba(255,255,255,0.1);color:#fff;cursor:pointer">Google ile Giriş</button>
+          <button id="auth-btn" style="font-size:12px;font-weight:600;padding:5px 12px;border:1px solid rgba(255,255,255,0.25);border-radius:20px;background:rgba(255,255,255,0.1);color:#fff;cursor:pointer">Google ile Giriş</button>
         </div>
       </div>
       <div class="week-nav">
@@ -305,7 +294,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <!-- İSTATİSTİKLER -->
     <div class="tab-page" id="page-istat">
       <div class="stat-section">
-        <!-- Bugünkü kalori -->
         <div class="card">
           <div class="card-title">Bugünkü Özet</div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
@@ -322,11 +310,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
             <div class="mkart"><div class="mkart-lbl">Yağ</div><div class="mkart-val bd-y" id="m-y">0g</div><div class="mkart-hedef" id="mh-y"></div><div class="mkart-bar"><div class="mkart-fill" style="background:var(--pink);width:0%" id="mb-y"></div></div></div>
           </div>
         </div>
-
-        <!-- İlerleme kartı -->
         <div class="card" id="ilerleme-card"></div>
-
-        <!-- Haftalık ilerleme -->
         <div class="card">
           <div class="card-title">Haftalık İlerleme</div>
           <div class="gun-row" id="gun-row"></div>
@@ -335,8 +319,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
           </div>
           <div class="bar-track"><div class="bar-fill bar-green" id="prog-bar" style="width:0%"></div></div>
         </div>
-
-        <!-- Haftalık makro özet -->
         <div class="card">
           <div class="card-title">Bu Haftanın Toplamı</div>
           <div class="haftalik-makro">
@@ -395,27 +377,40 @@ function obSel(k,v,el){obD[k]=v;el.closest('.ob-select-row').querySelectorAll('.
 function obProg(cur){document.getElementById('ob-prog').innerHTML=Array.from({length:5},(_,i)=>`<div class="ob-dot${i<=cur?' active':''}"></div>`).join('');}
 obProg(0);
 
+// ── ONBOARDING: Google giriş ──
 async function obGoogleGiris(){
   const btn=document.getElementById('ob-google-btn');
   const status=document.getElementById('ob-giris-status');
   btn.disabled=true;
-  status.textContent='Giriş yapılıyor...';
+  btn.style.opacity='0.7';
+  status.innerHTML='<div class="auth-loading"><div class="spinner"></div> Giriş yapılıyor...</div>';
   try{
-    const provider=new _GoogleProvider();
-    await _signInWithPopup(auth,provider);
-    // onAuthStateChanged devralacak
+    if(!auth){
+      status.innerHTML='<span style="color:var(--red)">Firebase yüklenemedi, girişsiz devam et.</span>';
+      btn.disabled=false;btn.style.opacity='1';
+      return;
+    }
+    const provider=new GoogleAuthProvider();
+    await signInWithPopup(auth,provider);
+    // onAuthStateChanged zaten devralacak
   }catch(e){
-    status.textContent='Giriş başarısız, tekrar dene.';
-    btn.disabled=false;
+    console.error('Google giriş hatası:',e);
+    let msg='Giriş başarısız. Tekrar dene.';
+    if(e.code==='auth/popup-blocked')msg='Popup engellendi. Tarayıcı izinlerini kontrol et.';
+    if(e.code==='auth/popup-closed-by-user')msg='Giriş penceresi kapatıldı.';
+    if(e.code==='auth/network-request-failed')msg='İnternet bağlantısı yok.';
+    status.innerHTML=`<span style="color:var(--red)">${msg}</span>`;
+    btn.disabled=false;btn.style.opacity='1';
   }
 }
 
 function obGirisAtla(){
-  // Girişsiz devam — onboarding adım 1'e geç
   document.getElementById('obs-0').classList.remove('active');
   document.getElementById('obs-1').classList.add('active');
   obProg(1);
-}function obNext(step){
+}
+
+function obNext(step){
   if(step===1){const isim=document.getElementById('ob-isim').value.trim();if(!isim||!obD.cins){alert('Tüm alanları doldur');return;}obD.isim=isim;}
   if(step===2){const y=+document.getElementById('ob-yas').value,b=+document.getElementById('ob-boy').value,k=+document.getElementById('ob-kilo').value;if(!y||!b||!k){alert('Tüm alanları doldur');return;}obD.yas=y;obD.boy=b;obD.kilo=k;}
   if(step===3){if(!obD.hedef||!obD.akt){alert('Seçim yap');return;}obHesapla();}
@@ -442,9 +437,9 @@ function obBitir(){
   obD.hKilo=hk;profil=obD;saveP();
   gunlukHedef=obD.hKcal;makroH={p:obD.mp,k:obD.mk,y:obD.my};
   localStorage.setItem('kaloriH',gunlukHedef);localStorage.setItem('makroH',JSON.stringify(makroH));
-  document.getElementById('onboarding').style.display='none';
-  document.getElementById('app').style.display='flex';
-  baslat();
+  // Firebase'e de yaz
+  if(currentUser)fbWrite('profil',{profil,gunlukHedef,makroH,gunKilolar});
+  showApp();
 }
 
 // ── BAŞLAT ──
@@ -471,6 +466,7 @@ function kiloModalAc(tarih){
 function kiloKaydet(tarih){
   const v=parseFloat(document.getElementById('kilo-inp').value);if(!v||v<30||v>300){alert('Geçerli kilo gir');return;}
   gunKilolar[tarih]=v;localStorage.setItem('gunKilolar',JSON.stringify(gunKilolar));
+  if(currentUser)fbWrite('profil',{profil,gunlukHedef,makroH,gunKilolar});
   document.getElementById('kilo-modal').remove();
   renderIstat();renderProfil();
 }
@@ -485,113 +481,12 @@ function switchTab(name,btn){
   if(name==='profil')renderProfil();
 }
 
-// ── SİLUET (Gerçekçi SVG path) ──
-function getSiluetSVG(oran, color, w=80, h=160){
-  // oran: 0=obez, 1=fit
-  // Sabit viewBox, sadece genişlik değerleri değişiyor
-  const vw=100, vh=220;
-  const cx=50;
-
-  // Kiloya göre genişlik çarpanı
-  const fat=1+((1-oran)*0.55); // obezde 1.55, fitte 1.0
-
-  // --- Sabit koordinatlar (fit vücut baseline) ---
-  // Baş
-  const headR=10, headCY=12;
-  // Boyun
-  const neckW=6*fat*0.6, neckTop=22, neckBot=28;
-  // Omuz genişliği
-  const shoulderW=22*fat;
-  // Gövde
-  const chestW=18*fat;
-  const waistW=13*fat;
-  const hipW=20*fat;
-  const torsoTop=28, torsoBot=105;
-  const waistY=72;
-  // Kol
-  const armTopW=6*fat;
-  const armBotW=4*fat;
-  // Bacak
-  const legW=9*fat;
-  const legGap=3*fat*0.4;
-
-  const p=`
-    M ${cx} ${headCY-headR}
-    a ${headR*fat*0.85} ${headR} 0 1 1 0.01 0 Z
-
-    M ${cx-neckW} ${neckTop}
-    L ${cx+neckW} ${neckTop}
-    L ${cx+neckW*1.1} ${neckBot}
-    L ${cx-neckW*1.1} ${neckBot} Z
-
-    M ${cx-shoulderW} ${torsoTop+2}
-    C ${cx-chestW*1.1} ${torsoTop+12} ${cx-waistW*1.05} ${waistY-5} ${cx-waistW} ${waistY}
-    C ${cx-hipW*0.95} ${waistY+18} ${cx-hipW} ${torsoBot-8} ${cx-hipW+1} ${torsoBot}
-    L ${cx+hipW-1} ${torsoBot}
-    C ${cx+hipW} ${torsoBot-8} ${cx+hipW*0.95} ${waistY+18} ${cx+waistW} ${waistY}
-    C ${cx+waistW*1.05} ${waistY-5} ${cx+chestW*1.1} ${torsoTop+12} ${cx+shoulderW} ${torsoTop+2}
-    C ${cx+shoulderW*0.6} ${torsoTop} ${cx+neckW*1.1} ${neckBot} ${cx+neckW*1.1} ${neckBot}
-    L ${cx-neckW*1.1} ${neckBot}
-    C ${cx-neckW*1.1} ${neckBot} ${cx-shoulderW*0.6} ${torsoTop} ${cx-shoulderW} ${torsoTop+2} Z
-
-    M ${cx-shoulderW+1} ${torsoTop+5}
-    C ${cx-shoulderW-8*fat} ${torsoTop+20} ${cx-shoulderW-10*fat} ${torsoTop+50} ${cx-shoulderW-6*fat} ${torsoTop+72}
-    C ${cx-shoulderW-4*fat} ${torsoTop+80} ${cx-shoulderW-1} ${torsoTop+84} ${cx-chestW+2} ${torsoTop+76}
-    C ${cx-chestW+4} ${torsoTop+65} ${cx-waistW*1.1} ${waistY+10} ${cx-waistW} ${waistY}
-    C ${cx-waistW*1.05} ${waistY-5} ${cx-chestW*1.1} ${torsoTop+12} ${cx-shoulderW+1} ${torsoTop+5} Z
-
-    M ${cx+shoulderW-1} ${torsoTop+5}
-    C ${cx+shoulderW+8*fat} ${torsoTop+20} ${cx+shoulderW+10*fat} ${torsoTop+50} ${cx+shoulderW+6*fat} ${torsoTop+72}
-    C ${cx+shoulderW+4*fat} ${torsoTop+80} ${cx+shoulderW+1} ${torsoTop+84} ${cx+chestW-2} ${torsoTop+76}
-    C ${cx+chestW-4} ${torsoTop+65} ${cx+waistW*1.1} ${waistY+10} ${cx+waistW} ${waistY}
-    C ${cx+waistW*1.05} ${waistY-5} ${cx+chestW*1.1} ${torsoTop+12} ${cx+shoulderW-1} ${torsoTop+5} Z
-
-    M ${cx-hipW+1} ${torsoBot}
-    C ${cx-hipW} ${torsoBot+5} ${cx-legGap-legW} ${torsoBot+10} ${cx-legGap-legW+1} ${torsoBot+30}
-    C ${cx-legGap-legW+1} ${torsoBot+60} ${cx-legGap-legW*0.85} ${torsoBot+80} ${cx-legGap-legW*0.7} ${vh-8}
-    C ${cx-legGap-legW*0.5} ${vh-4} ${cx-legGap-2} ${vh-2} ${cx-legGap} ${vh-2}
-    C ${cx-legGap+1} ${vh-2} ${cx-1} ${vh-1} ${cx-1} ${torsoBot+45}
-    C ${cx-1} ${torsoBot+15} ${cx-hipW*0.5} ${torsoBot+8} ${cx-hipW+1} ${torsoBot} Z
-
-    M ${cx+hipW-1} ${torsoBot}
-    C ${cx+hipW} ${torsoBot+5} ${cx+legGap+legW} ${torsoBot+10} ${cx+legGap+legW-1} ${torsoBot+30}
-    C ${cx+legGap+legW-1} ${torsoBot+60} ${cx+legGap+legW*0.85} ${torsoBot+80} ${cx+legGap+legW*0.7} ${vh-8}
-    C ${cx+legGap+legW*0.5} ${vh-4} ${cx+legGap+2} ${vh-2} ${cx+legGap} ${vh-2}
-    C ${cx+legGap-1} ${vh-2} ${cx+1} ${vh-1} ${cx+1} ${torsoBot+45}
-    C ${cx+1} ${torsoBot+15} ${cx+hipW*0.5} ${torsoBot+8} ${cx+hipW-1} ${torsoBot} Z
-  `;
-
-  return `<svg width="${w}" height="${h}" viewBox="0 0 ${vw} ${vh}" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <filter id="glow">
-        <feGaussianBlur stdDeviation="2" result="blur"/>
-        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
-    </defs>
-    <path d="${p}" fill="${color}" filter="url(#glow)"/>
-  </svg>`;
-}
-
-function getSiluetOran(){
-  if(!profil)return 0.5;
-  const bugun=new Date().toISOString().slice(0,10);
-  const mevcutKilo=gunKilolar[bugun]||profil.kilo;
-  const bas=parseFloat(profil.kilo);
-  const hdf=parseFloat(profil.hKilo||profil.hedefKilo||profil.hkilo||bas);
-  if(bas===hdf)return 0.5;
-  return Math.max(0,Math.min(1,(bas-mevcutKilo)/(bas-hdf)));
-}
 function getMealOran(){
   const today=new Date();today.setHours(0,0,0,0);
   const wk=getMonday(today,0).toISOString().slice(0,10);
   const di=(today.getDay()+6)%7;
   const st=data[wk]||{meals:{}};
   return MEALS.filter((_,mi)=>!!st.meals?.[`${di}-${mi}`]).length/3;
-}
-function getOranColor(oran){
-  const r=oran<0.5?220:Math.round(220*(1-oran)*2);
-  const g=oran>0.5?158:Math.round(oran*316);
-  return`rgb(${r},${g},80)`;
 }
 
 function renderIlerleme(){
@@ -606,11 +501,8 @@ function renderIlerleme(){
   const kalan=Math.max(0,(simdi-hedef)).toFixed(1);
   const kayip=(baslangic-simdi).toFixed(1);
   const veriyorMu=hedef<baslangic;
-
-  // Emoji & renk
   const emoji=yuzde<25?'🌱':yuzde<50?'💪':yuzde<75?'🔥':yuzde<100?'⚡':'🏆';
   const color=yuzde<33?'var(--blue)':yuzde<66?'var(--orange)':'var(--green)';
-
   el.innerHTML=`
     <div class="card-title">Kilo Hedefi İlerlemesi</div>
     <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">
@@ -647,7 +539,7 @@ function renderIlerleme(){
     </div>`;
 }
 
-// ── ÖĞÜN TAMAMLAMA OVERLAY ──
+// ── ÖĞÜN TAMAMLAMA ──
 function showMealComplete(di,mi){
   const wk=weekKey(weekOffset);
   const st=data[wk]||{meals:{}};
@@ -655,14 +547,7 @@ function showMealComplete(di,mi){
   const msgs=[{e:'☀️',t:'Kahvaltı tamam!',s:'Güne harika başladın! 💪'},{e:'🌤️',t:'Öğle tamam!',s:'Yarı yoldasın, devam et!'},{e:'🌙',t:'Akşam tamam!',s:'Günü tamamladın, muhteşem!'}];
   const msg=msgs[mi];
   const ov=document.createElement('div');ov.className='mc-ov';
-  ov.innerHTML=`<div class="mc-card">
-    <span class="mc-ico">${msg.e}</span>
-    <div class="mc-title">${msg.t}</div>
-    <div class="mc-sub">${msg.s}</div>
-    <div style="font-size:48px;margin:1rem 0">${tam===1?'🥗':tam===2?'🥗🥗':'🥗🥗🥗'}</div>
-    <div style="font-size:13px;color:var(--green);font-weight:700;margin-bottom:1.25rem">${tam}/3 öğün tamamlandı ✓</div>
-    <button class="mc-close" onclick="this.closest('.mc-ov').remove()">Harika! 💪</button>
-  </div>`;
+  ov.innerHTML=`<div class="mc-card"><span class="mc-ico">${msg.e}</span><div class="mc-title">${msg.t}</div><div class="mc-sub">${msg.s}</div><div style="font-size:48px;margin:1rem 0">${tam===1?'🥗':tam===2?'🥗🥗':'🥗🥗🥗'}</div><div style="font-size:13px;color:var(--green);font-weight:700;margin-bottom:1.25rem">${tam}/3 öğün tamamlandı ✓</div><button class="mc-close" onclick="this.closest('.mc-ov').remove()">Harika! 💪</button></div>`;
   document.body.appendChild(ov);setTimeout(()=>{if(ov.parentNode)ov.remove();},5000);
 }
 
@@ -779,7 +664,7 @@ function kalGuncelle(){
 
 // ── İSTATİSTİK ──
 function renderIstat(){
-  kalGuncelle();  renderIlerleme();
+  kalGuncelle();renderIlerleme();
   const dates=getWeekDates(weekOffset);
   const today=new Date();today.setHours(0,0,0,0);
   let total=0,done=0,hkc=0,hp=0,hk=0,hyg=0;
@@ -841,6 +726,7 @@ function renderProfil(){
     </div>
     <div class="profil-kart">
       <h3>Hesap</h3>
+      ${currentUser?`<div class="profil-row"><span class="profil-row-lbl">Giriş yapılan hesap</span><span class="profil-row-val" style="font-size:12px">${currentUser.email||currentUser.displayName}</span></div>`:''}
       <button class="sifirla-btn" onclick="hesabiSifirla()">🔄 Profili Sıfırla</button>
     </div>`;
 }
@@ -848,7 +734,8 @@ function renderProfil(){
 function profilKiloKaydet(){
   const v=parseFloat(document.getElementById('profil-kilo-inp').value);if(!v||v<30||v>300){alert('Geçerli kilo gir');return;}
   const bugun=new Date().toISOString().slice(0,10);gunKilolar[bugun]=v;localStorage.setItem('gunKilolar',JSON.stringify(gunKilolar));
-  renderProfil();renderIstat();renderSiluet();
+  if(currentUser)fbWrite('profil',{profil,gunlukHedef,makroH,gunKilolar});
+  renderProfil();renderIstat();
 }
 function hesabiSifirla(){
   if(!confirm('Profili sıfırlamak istediğine emin misin? Tüm veriler silinecek!'))return;
@@ -869,7 +756,7 @@ function tryToggle(di,mi){
   if(was){st.meals[k]=false;save();render();return;}
   if(!canCheck(di,mi)){shake(di,mi);hint(di,mi);return;}
   st.meals[k]=true;save();playMeal();trigFX(di,mi);
-  setTimeout(()=>{showMealComplete(di,mi);checkDay(di);renderSiluet();renderIstat();},300);
+  setTimeout(()=>{showMealComplete(di,mi);checkDay(di);renderIstat();},300);
   render();
 }
 function shake(di,mi){const el=document.getElementById(`chk-${di}-${mi}`);if(!el)return;const seq=[6,-6,6,-6,0];let i=0;const run=()=>{if(i>=seq.length){el.style.transform='';return;}el.style.transform=`translateX(${seq[i]}px)`;i++;setTimeout(run,55);};run();}
@@ -942,7 +829,9 @@ function bigBurst(di){const cards=document.querySelectorAll('.day-card');const d
 function spawn(cx,cy,n){const cols=['#1D9E75','#EF9F27','#378ADD','#D4537E','#E24B4A','#7F77DD','#5DCAA5'];for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,sp=2+Math.random()*6;pts.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,decay:0.013+Math.random()*0.018,size:4+Math.random()*4,color:cols[Math.floor(Math.random()*cols.length)],rot:Math.random()*Math.PI*2,rotV:(Math.random()-0.5)*0.25,shape:Math.floor(Math.random()*3)});}}
 function animate(){anim=true;fc.clearRect(0,0,fxC.width,fxC.height);pts=pts.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.18;p.vx*=0.98;p.life-=p.decay;p.rot+=p.rotV;if(p.life<=0)return false;fc.save();fc.globalAlpha=p.life;fc.translate(p.x,p.y);fc.rotate(p.rot);fc.fillStyle=p.color;if(p.shape===0){fc.beginPath();fc.arc(0,0,p.size/2,0,Math.PI*2);fc.fill();}else if(p.shape===1){fc.fillRect(-p.size/2,-p.size/4,p.size,p.size/2);}else{fc.beginPath();fc.moveTo(0,-p.size/2);fc.lineTo(p.size/2,p.size/2);fc.lineTo(-p.size/2,p.size/2);fc.closePath();fc.fill();}fc.restore();return true;});if(pts.length>0)requestAnimationFrame(animate);else anim=false;}
 
-// ── FİREBASE ──
+// ══════════════════════════════════════════
+// ── FİREBASE — DÜZELTİLMİŞ ──
+// ══════════════════════════════════════════
 const fbConfig={
   apiKey:"AIzaSyBisvA51xKnQb5LROqZNMJgfASOweAL9Ck",
   authDomain:"ogunlerim.firebaseapp.com",
@@ -952,104 +841,135 @@ const fbConfig={
   appId:"1:668568073771:web:8a9d4528ca084263841c6e"
 };
 
-let db=null,auth=null,currentUser=null;
-let _setDoc,_doc,_getDoc,_onSnapshot,_GoogleProvider,_signInWithPopup,_signOut;
+let db=null, auth=null, currentUser=null;
+let GoogleAuthProvider, signInWithPopup, signOut;
+let setDoc, doc, getDoc, onSnapshot;
 
 async function initFirebase(){
   try{
-    const {initializeApp}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-    const fb=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const {getAuth,GoogleAuthProvider,signInWithRedirect,getRedirectResult,onAuthStateChanged,signOut}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-    auth=getAuth(fbApp);
-    _GoogleProvider=GoogleAuthProvider;
-    _signInWithPopup=signInWithRedirect;
-    _signOut=signOut;
+    const {initializeApp} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const fbApp = initializeApp(fbConfig); // ← fbApp düzeltildi
 
-    // Redirect sonucunu kontrol et
-    try{
-      const result=await getRedirectResult(auth);
-      if(result){currentUser=result.user;}
-    }catch(e){console.log('redirect result',e);}
+    // Firestore
+    const fs = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    db = fs.getFirestore(fbApp);
+    setDoc = fs.setDoc;
+    doc = fs.doc;
+    getDoc = fs.getDoc;
+    onSnapshot = fs.onSnapshot;
 
-    onAuthStateChanged(auth,async user=>{
+    // Auth
+    const fa = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    auth = fa.getAuth(fbApp);
+    GoogleAuthProvider = fa.GoogleAuthProvider;
+    signInWithPopup = fa.signInWithPopup;
+    signOut = fa.signOut;
+
+    // Auth butonu bağla
+    updateAuthUI();
+
+    fa.onAuthStateChanged(auth, async user => {
       if(user){
-        currentUser=user;
+        currentUser = user;
         updateAuthUI();
         await syncFromFirebase();
       } else {
-        currentUser=null;
+        currentUser = null;
         updateAuthUI();
         // Giriş yok — local veriye bak
-        if(profil)showApp();else showOnboarding();
+        if(profil) showApp();
+        else showOnboarding();
       }
     });
+
   }catch(e){
-    console.log('Firebase yüklenemedi',e);
-    if(profil)showApp();
-  else{
-    // Google girişi tamam ama profil yok — adım 1'e geç
-    document.getElementById('obs-0').classList.remove('active');
-    document.getElementById('obs-1').classList.add('active');
-    obProg(1);
-    // İsim alanına Google adını doldur
-    const nameInp=document.getElementById('ob-isim');
-    if(nameInp&&currentUser.displayName)nameInp.value=currentUser.displayName.split(' ')[0];
-  }
+    console.error('Firebase yüklenemedi:', e);
+    // Firebase olmadan da çalış
+    if(profil) showApp();
+    else showOnboarding();
   }
 }
 
 function updateAuthUI(){
-  const btn=document.getElementById('auth-btn');
-  if(!btn)return;
+  const btn = document.getElementById('auth-btn');
+  const nameEl = document.getElementById('auth-name');
+  if(!btn) return;
   if(currentUser){
-    btn.textContent='Çıkış Yap';
-    btn.onclick=()=>_signOut(auth);
-    const nameEl=document.getElementById('auth-name');
-    if(nameEl)nameEl.textContent=currentUser.displayName||currentUser.email||'';
+    if(nameEl) nameEl.textContent = currentUser.displayName || currentUser.email || '';
+    btn.textContent = 'Çıkış Yap';
+    btn.onclick = async () => {
+      try{ await signOut(auth); }catch(e){ console.error(e); }
+    };
   } else {
-    btn.textContent='Google ile Giriş';
-    btn.onclick=googleGiris;
+    if(nameEl) nameEl.textContent = '';
+    btn.textContent = 'Google ile Giriş';
+    btn.onclick = googleGiris;
   }
 }
 
 async function googleGiris(){
+  if(!auth || !GoogleAuthProvider){
+    alert('Firebase henüz yüklenmedi, biraz bekle.');
+    return;
+  }
   try{
-    const provider=new _GoogleProvider();
-    await _signInWithPopup(auth,provider);
-  }catch(e){console.log('Giriş hatası',e);}
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
+  }catch(e){
+    console.error('Giriş hatası:', e);
+    let msg = 'Giriş başarısız.';
+    if(e.code === 'auth/popup-blocked') msg = 'Popup engellendi. Tarayıcı izinlerini kontrol et.';
+    if(e.code === 'auth/popup-closed-by-user') msg = 'Giriş penceresi kapatıldı.';
+    alert(msg);
+  }
 }
 
 async function syncFromFirebase(){
-  if(!currentUser||!db)return;
+  if(!currentUser || !db) return;
   try{
-    const uid=currentUser.uid;
-    const pSnap=await _getDoc(_doc(db,'users',uid,'profil','data'));
-    if(pSnap.exists()){
-      const pd=pSnap.data();
-      if(pd.profil){profil=pd.profil;saveP();}
-      if(pd.gunlukHedef){gunlukHedef=pd.gunlukHedef;localStorage.setItem('kaloriH',gunlukHedef);}
-      if(pd.makroH){makroH=pd.makroH;localStorage.setItem('makroH',JSON.stringify(makroH));}
-      if(pd.gunKilolar){gunKilolar=pd.gunKilolar;localStorage.setItem('gunKilolar',JSON.stringify(gunKilolar));}
-    }
-    const dSnap=await _getDoc(_doc(db,'users',uid,'ogunler','data'));
-    if(dSnap.exists()&&dSnap.data().data){data=dSnap.data().data;save();}
+    const uid = currentUser.uid;
 
-    _onSnapshot(_doc(db,'users',uid,'ogunler','data'),snap=>{
-      if(snap.exists()&&snap.data().data){data=snap.data().data;save();if(profil){render();renderIstat();}}
+    const pSnap = await getDoc(doc(db,'users',uid,'profil','data'));
+    if(pSnap.exists()){
+      const pd = pSnap.data();
+      if(pd.profil){ profil=pd.profil; saveP(); }
+      if(pd.gunlukHedef){ gunlukHedef=pd.gunlukHedef; localStorage.setItem('kaloriH',gunlukHedef); }
+      if(pd.makroH){ makroH=pd.makroH; localStorage.setItem('makroH',JSON.stringify(makroH)); }
+      if(pd.gunKilolar){ gunKilolar=pd.gunKilolar; localStorage.setItem('gunKilolar',JSON.stringify(gunKilolar)); }
+    }
+
+    const dSnap = await getDoc(doc(db,'users',uid,'ogunler','data'));
+    if(dSnap.exists() && dSnap.data().data){ data=dSnap.data().data; save(); }
+
+    // Gerçek zamanlı dinle
+    onSnapshot(doc(db,'users',uid,'ogunler','data'), snap=>{
+      if(snap.exists() && snap.data().data){ data=snap.data().data; save(); if(profil){ render(); renderIstat(); } }
     });
-    _onSnapshot(_doc(db,'users',uid,'profil','data'),snap=>{
+    onSnapshot(doc(db,'users',uid,'profil','data'), snap=>{
       if(snap.exists()){
-        const pd=snap.data();
-        if(pd.gunKilolar){gunKilolar=pd.gunKilolar;localStorage.setItem('gunKilolar',JSON.stringify(gunKilolar));renderIstat();renderProfil();}
+        const pd = snap.data();
+        if(pd.gunKilolar){ gunKilolar=pd.gunKilolar; localStorage.setItem('gunKilolar',JSON.stringify(gunKilolar)); renderIstat(); renderProfil(); }
       }
     });
-  }catch(e){console.log('Sync err',e);}
-  if(profil)showApp();else showOnboarding();
+
+  }catch(e){ console.error('Sync hatası:', e); }
+
+  if(profil) showApp();
+  else {
+    // Google girişi tamam ama profil yok — adım 1'e geç
+    showOnboarding();
+    document.getElementById('obs-0').classList.remove('active');
+    document.getElementById('obs-1').classList.add('active');
+    obProg(1);
+    const nameInp = document.getElementById('ob-isim');
+    if(nameInp && currentUser.displayName) nameInp.value = currentUser.displayName.split(' ')[0];
+  }
 }
 
-function fbWrite(path,dat){
-  if(!db||!currentUser)return;
-  _setDoc(_doc(db,'users',currentUser.uid,path,'data'),dat,{merge:true}).catch(e=>console.log('FB write',e));
+function fbWrite(path, dat){
+  if(!db || !currentUser) return;
+  setDoc(doc(db,'users',currentUser.uid, path,'data'), dat, {merge:true})
+    .catch(e => console.error('FB write:', e));
 }
 
 function showApp(){
@@ -1062,21 +982,18 @@ function showOnboarding(){
   document.getElementById('app').style.display='none';
 }
 
-// Save fonksiyonlarını Firebase'e de yaz
-const _origSave=save;
-window.save=function(){_origSave();fbWrite('ogunler',{data});};
-const _origSaveP=saveP;
-window.saveP=function(){_origSaveP();fbWrite('profil',{profil,gunlukHedef,makroH,gunKilolar});};
-function fbSaveKilolar(){
-  localStorage.setItem('gunKilolar',JSON.stringify(gunKilolar));
-  fbWrite('profil',{profil,gunlukHedef,makroH,gunKilolar});
-}
+// Save'lere Firebase yazımı ekle
+const _origSave = save;
+window.save = function(){ _origSave(); fbWrite('ogunler',{data}); };
+const _origSaveP = saveP;
+window.saveP = function(){ _origSaveP(); fbWrite('profil',{profil,gunlukHedef,makroH,gunKilolar}); };
 
-// Butonları bağla
+// Onboarding butonları
 document.getElementById('ob-google-btn').addEventListener('click', obGoogleGiris);
 document.getElementById('ob-atla-btn').addEventListener('click', obGirisAtla);
 
-if('serviceWorker' in navigator)navigator.serviceWorker.register('/ogunler/service-worker.js',{scope:'/ogunler/'});
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/ogunler/service-worker.js',{scope:'/ogunler/'});
+
 initFirebase();
 </script>
 </body>
