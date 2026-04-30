@@ -994,9 +994,10 @@ function getSuTakviye(di){
 
 function suToggle(di,idx){
   const d=getSuTakviye(di);
+  const toplamBardak=Math.max(4,Math.ceil(suHedefi/250));
   const yeniBardak=d.su===idx+1?idx:idx+1;
-  d.su=yeniBardak;
-  d.suMl=yeniBardak*250;
+  d.su=Math.min(yeniBardak,toplamBardak);
+  d.suMl=d.su*250;
   save();renderSuTakviye(di);
 }
 
@@ -1035,6 +1036,7 @@ function renderSuTakviye(di){
   const bardakDolu=Math.min(8,Math.round(toplamMl/250));
   const yuzde=Math.min(100,Math.round(toplamMl/2000*100));
   const toplamBardak=Math.max(4,Math.ceil(suHedefi/250));
+  const bardakDolu=Math.min(toplamBardak,d.su||Math.round(toplamMl/250));
   const bardaklar=Array.from({length:toplamBardak},(_,i)=>`<div class="su-bardak${i<bardakDolu?' dolu':''}" onclick="suToggle(${di},${i})">🥛</div>`).join('');
 
   const takvGrid=TAKVIYELER.map((t,ti)=>{
