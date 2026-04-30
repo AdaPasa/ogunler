@@ -191,6 +191,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .auth-loading{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--sub);margin-top:1rem;justify-content:center}
 .spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin 0.7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* Yemek arama modal */
+.yemek-modal-ov{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;display:flex;align-items:flex-end;justify-content:center;padding:0}
+.yemek-modal{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:1.25rem;max-height:85vh;display:flex;flex-direction:column;border-top:1px solid var(--border)}
+.yemek-modal-title{font-size:15px;font-weight:700;margin-bottom:1rem;text-align:center}
+.yemek-arama{width:100%;border:1.5px solid var(--border);border-radius:12px;padding:11px 14px;font-size:15px;background:var(--card2);color:var(--text);outline:none;margin-bottom:10px}
+.yemek-arama:focus{border-color:var(--green)}
+.yemek-liste{overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.yemek-item{padding:10px 14px;border-radius:11px;border:1.5px solid var(--border);background:var(--card2);cursor:pointer;transition:border-color 0.15s}
+.yemek-item:hover,.yemek-item.secili{border-color:var(--green);background:var(--gl)}
+.yemek-item-isim{font-size:14px;font-weight:600}
+.yemek-item-birim{font-size:11px;color:var(--sub);margin-top:2px}
+.yemek-miktar-row{display:flex;align-items:center;gap:10px;padding:10px;background:var(--card2);border-radius:12px;border:1px solid var(--border);margin-bottom:10px}
+.yemek-miktar-lbl{font-size:13px;color:var(--sub);white-space:nowrap}
+.yemek-miktar-inp{flex:1;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;font-size:16px;background:var(--bg);color:var(--text);outline:none;text-align:center}
+.yemek-miktar-inp:focus{border-color:var(--green)}
+.yemek-miktar-birim{font-size:13px;font-weight:600;color:var(--green);white-space:nowrap}
+.yemek-ekle-btn{width:100%;padding:14px;border:none;border-radius:12px;background:var(--green);color:#fff;font-size:15px;font-weight:700;cursor:pointer}
+.yemek-ekle-btn:disabled{opacity:0.4;cursor:default}
+.yemek-iptal{width:100%;padding:12px;border:1px solid var(--border);border-radius:12px;background:transparent;color:var(--sub);font-size:14px;cursor:pointer;margin-top:6px}
 </style>
 </head>
 <body>
@@ -631,21 +651,118 @@ function getMinOff(){return Math.round((getMonday(START_DATE,0)-getMonday(new Da
 function changeWeek(d){const mn=getMinOff();const nx=weekOffset+d;if(nx<mn)return;weekOffset=nx;render();}
 
 // ── YEMEK ──
-function getY(di,mi){const st=getState();if(!st.yemekler)st.yemekler={};if(!st.yemekler[`${di}-${mi}`])st.yemekler[`${di}-${mi}`]=[{ad:'',kcal:null,p:null,k:null,y:null}];return st.yemekler[`${di}-${mi}`];}
-function yEkle(di,mi){getY(di,mi).push({ad:'',kcal:null,p:null,k:null,y:null});save();render();setTimeout(()=>{const inp=document.querySelectorAll(`#yl-${di}-${mi} .yin`);if(inp.length)inp[inp.length-1].focus();},50);}
-function ySil(di,mi,idx){const l=getY(di,mi);l.splice(idx,1);if(l.length===0)l.push({ad:'',kcal:null,p:null,k:null,y:null});getState().meals[`${di}-${mi}`]=false;save();render();}
-function yDegis(di,mi,idx,val){getY(di,mi)[idx].ad=val;const chk=document.getElementById(`chk-${di}-${mi}`);if(chk&&!getState().meals[`${di}-${mi}`])chk.className='meal-check '+(canCheck(di,mi)?'ready':'locked');}
-function yBlur(di,mi,idx,val){
-  if(!val.trim())return;
-  getY(di,mi)[idx].ad=val;
-  const s=parseG(val);
-  const el=document.getElementById(`kb-${di}-${mi}-${idx}`);
-  const det=document.getElementById(`det-${di}-${mi}-${idx}`);
-  if(s){const y=getY(di,mi)[idx];y.kcal=s.kcal;y.p=s.p;y.k=s.k;y.y=s.y;save();if(el){el.className='kbadge';el.textContent='~'+s.kcal+' kcal';}if(det)det.innerHTML=`<span class="bd-p">P:${s.p}g</span><span class="bd-k">K:${s.k}g</span><span class="bd-y">Y:${s.y}g</span>`;}
-  else{if(el){el.className='';el.textContent='?';}}
-  kalGuncelle();mealSum(di,mi);
-  const chk=document.getElementById(`chk-${di}-${mi}`);if(chk&&!getState().meals[`${di}-${mi}`])chk.className='meal-check '+(canCheck(di,mi)?'ready':'locked');
+let _yModalDi=0,_yModalMi=0,_yModalIdx=0,_ySecili=null;
+
+function getY(di,mi){const st=getState();if(!st.yemekler)st.yemekler={};if(!st.yemekler[`${di}-${mi}`])st.yemekler[`${di}-${mi}`]=[];return st.yemekler[`${di}-${mi}`];}
+
+function yEkle(di,mi){
+  // Yeni boş slot ekle, modal aç
+  const l=getY(di,mi);
+  l.push({ad:'',kcal:null,p:null,k:null,y:null});
+  const idx=l.length-1;
+  save();
+  yModalAc(di,mi,idx);
 }
+
+function ySil(di,mi,idx){
+  const l=getY(di,mi);
+  l.splice(idx,1);
+  if(MEALS.every((_,m)=>getY(di,m).length===0)||l.length===0)getState().meals[`${di}-${mi}`]=false;
+  save();render();
+}
+
+function yModalAc(di,mi,idx){
+  _yModalDi=di;_yModalMi=mi;_yModalIdx=idx;_ySecili=null;
+  const ov=document.createElement('div');
+  ov.className='yemek-modal-ov';ov.id='yemek-modal-ov';
+  ov.innerHTML=`
+    <div class="yemek-modal">
+      <div class="yemek-modal-title">Yemek Seç</div>
+      <input class="yemek-arama" id="yemek-ara" placeholder="Ara... (yumurta, tavuk, yulaf...)" oninput="yFiltrele(this.value)" autofocus>
+      <div class="yemek-liste" id="yemek-liste"></div>
+      <div id="yemek-miktar-row" style="display:none" class="yemek-miktar-row">
+        <span class="yemek-miktar-lbl" id="yemek-miktar-lbl">Miktar:</span>
+        <input class="yemek-miktar-inp" id="yemek-miktar-inp" type="number" min="0.1" step="0.1" placeholder="1" oninput="yMiktarGuncelle()">
+        <span class="yemek-miktar-birim" id="yemek-miktar-birim"></span>
+      </div>
+      <button class="yemek-ekle-btn" id="yemek-ekle-btn" disabled onclick="yModalKaydet()">Ekle</button>
+      <button class="yemek-iptal" onclick="yModalKapat()">İptal</button>
+    </div>`;
+  ov.onclick=e=>{if(e.target===ov)yModalKapat();};
+  document.body.appendChild(ov);
+  yFiltrele('');
+  setTimeout(()=>document.getElementById('yemek-ara')?.focus(),100);
+}
+
+function yFiltrele(q){
+  const liste=document.getElementById('yemek-liste');if(!liste)return;
+  const filt=q.trim().toLowerCase();
+  const sonuc=BESINLER.filter(b=>b.isimler.some(i=>i.includes(filt)));
+  if(sonuc.length===0){liste.innerHTML='<div style="text-align:center;color:var(--sub);padding:1rem;font-size:13px">Bulunamadı</div>';return;}
+  liste.innerHTML=sonuc.map((b,i)=>`
+    <div class="yemek-item" id="yi-${i}" onclick="ySecBesini(${BESINLER.indexOf(b)})">
+      <div class="yemek-item-isim">${b.isimler[0].charAt(0).toUpperCase()+b.isimler[0].slice(1)}</div>
+      <div class="yemek-item-birim">${b.birim==='gram'?'gram bazlı':b.birim==='ml'?'ml bazlı':'adet bazlı'} · ${b.birim==='adet'?b.kcal+' kcal/adet':Math.round(b.kcal*100)+' kcal/100'+b.birim}</div>
+    </div>`).join('');
+}
+
+function ySecBesini(idx){
+  _ySecili=BESINLER[idx];
+  document.querySelectorAll('.yemek-item').forEach(el=>el.classList.remove('secili'));
+  // Seçili elemanı bul
+  const liste=document.getElementById('yemek-liste');
+  const items=liste.querySelectorAll('.yemek-item');
+  const filt=document.getElementById('yemek-ara').value.trim().toLowerCase();
+  const sonuc=BESINLER.filter(b=>b.isimler.some(i=>i.includes(filt)));
+  const i=sonuc.indexOf(_ySecili);
+  if(items[i])items[i].classList.add('secili');
+
+  const row=document.getElementById('yemek-miktar-row');
+  const lbl=document.getElementById('yemek-miktar-lbl');
+  const birim=document.getElementById('yemek-miktar-birim');
+  const inp=document.getElementById('yemek-miktar-inp');
+  if(row){row.style.display='flex';}
+  if(lbl)lbl.textContent='Miktar:';
+  if(birim)birim.textContent=_ySecili.birim;
+  if(inp){inp.value='';inp.placeholder=_ySecili.birim==='adet'?'örn: 2':'örn: 150';inp.focus();}
+  document.getElementById('yemek-ekle-btn').disabled=false;
+}
+
+function yMiktarGuncelle(){
+  // Anlık önizleme için (opsiyonel)
+}
+
+function yModalKaydet(){
+  if(!_ySecili)return;
+  const mik=parseFloat(document.getElementById('yemek-miktar-inp').value)||1;
+  const isim=_ySecili.isimler[0].charAt(0).toUpperCase()+_ySecili.isimler[0].slice(1);
+  const ad=`${mik} ${_ySecili.birim} ${isim}`;
+  const kcal=Math.round(mik*_ySecili.kcal);
+  const p=Math.round(mik*_ySecili.p*10)/10;
+  const k=Math.round(mik*_ySecili.k*10)/10;
+  const y=Math.round(mik*_ySecili.y*10)/10;
+  const l=getY(_yModalDi,_yModalMi);
+  l[_yModalIdx]={ad,kcal,p,k,y};
+  save();
+  yModalKapat();
+  render();
+  kalGuncelle();
+  mealSum(_yModalDi,_yModalMi);
+  const chk=document.getElementById(`chk-${_yModalDi}-${_yModalMi}`);
+  if(chk&&!getState().meals[`${_yModalDi}-${_yModalMi}`])chk.className='meal-check '+(canCheck(_yModalDi,_yModalMi)?'ready':'locked');
+}
+
+function yModalKapat(){
+  // Eğer slot boşsa sil
+  const l=getY(_yModalDi,_yModalMi);
+  if(l[_yModalIdx]&&!l[_yModalIdx].ad){l.splice(_yModalIdx,1);}
+  save();
+  const ov=document.getElementById('yemek-modal-ov');if(ov)ov.remove();
+  render();
+}
+
+function canCheck(di,mi){return getY(di,mi).some(y=>y.ad&&y.ad.trim());}
+
 function mealSum(di,mi){
   const l=getY(di,mi);
   const kc=l.reduce((s,y)=>s+(y.kcal||0),0);
@@ -763,7 +880,6 @@ function delPhoto(di,mi){delete getState().photos[`${di}-${mi}`];save();render()
 function lightbox(src){const lb=document.createElement('div');lb.className='lightbox';lb.innerHTML=`<img src="${src}">`;lb.onclick=()=>lb.remove();document.body.appendChild(lb);}
 
 // ── KİLİT & TAMAMLAMA ──
-function canCheck(di,mi){return getY(di,mi).some(y=>y.ad.trim());}
 function tryToggle(di,mi){
   const st=getState();const k=`${di}-${mi}`;const was=!!st.meals[k];
   if(was){st.meals[k]=false;save();render();return;}
@@ -804,11 +920,13 @@ function render(){
       const ty=Math.round(l.reduce((s,y)=>s+(y.y||0),0)*10)/10;
       const yrows=l.map((y,idx)=>`
         <div class="yrow">
-          <input class="yin${chk?' done':''}" placeholder="örn: 3 yumurta, 150 tavuk göğüs" value="${(y.ad||'').replace(/"/g,'&quot;')}" oninput="yDegis(${di},${mi},${idx},this.value)" onblur="yBlur(${di},${mi},${idx},this.value)">
-          <span id="kb-${di}-${mi}-${idx}" class="${y.kcal?'kbadge':''}">${y.kcal?'~'+y.kcal+' kcal':''}</span>
+          <div style="flex:1;display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--border);border-radius:9px;background:var(--card2);cursor:pointer;min-width:0" onclick="yModalAc(${di},${mi},${idx})">
+            <span style="font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:${y.ad?'var(--text)':'var(--sub)'}">${y.ad||'Yemek seç...'}</span>
+            ${y.kcal?`<span class="kbadge">~${y.kcal} kcal</span>`:''}
+          </div>
           <button class="silbtn" onclick="ySil(${di},${mi},${idx})">✕</button>
         </div>
-        <div class="bdet" id="det-${di}-${mi}-${idx}">${y.p!=null?`<span class="bd-p">P:${y.p}g</span><span class="bd-k">K:${y.k}g</span><span class="bd-y">Y:${y.y}g</span>`:''}</div>`).join('');
+        <div class="bdet" id="det-${di}-${mi}-${idx}">${y.p!=null&&y.ad?`<span class="bd-p">P:${y.p}g</span><span class="bd-k">K:${y.k}g</span><span class="bd-y">Y:${y.y}g</span>`:''}</div>`).join('');
       const phtml=photo?`<div class="photo-thumb-wrap"><img class="photo-thumb" src="${photo}" onclick="lightbox('${photo}')"><button class="photo-del" onclick="delPhoto(${di},${mi})">✕</button></div>`:`<div class="photo-btn" onclick="fotoMenu(${di},${mi})">📷 Fotoğraf ekle</div>`;
       return`<div class="meal-block">
         <div class="meal-hdr"><div class="meal-check ${lc}" id="chk-${di}-${mi}" onclick="tryToggle(${di},${mi})"></div><span class="meal-ico">${M_ICO[mi]}</span><span class="meal-lbl">${m}</span></div>
