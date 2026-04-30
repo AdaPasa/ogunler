@@ -415,7 +415,7 @@ function obGirisAtla(){
   document.getElementById('obs-0').classList.remove('active');
   document.getElementById('obs-1').classList.add('active');
   obProg(1);
-}
+}function obNext(step){
   if(step===1){const isim=document.getElementById('ob-isim').value.trim();if(!isim||!obD.cins){alert('Tüm alanları doldur');return;}obD.isim=isim;}
   if(step===2){const y=+document.getElementById('ob-yas').value,b=+document.getElementById('ob-boy').value,k=+document.getElementById('ob-kilo').value;if(!y||!b||!k){alert('Tüm alanları doldur');return;}obD.yas=y;obD.boy=b;obD.kilo=k;}
   if(step===3){if(!obD.hedef||!obD.akt){alert('Seçim yap');return;}obHesapla();}
