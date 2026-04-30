@@ -991,7 +991,7 @@ function fbSaveKilolar(){
   if(window._fbSetDoc)window._fbSetDoc('profil',{profil,gunlukHedef,makroH,gunKilolar});
 }
 
-if('serviceWorker' in navigator)navigator.serviceWorker.register('/service-worker.js');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('/ogunler/service-worker.js',{scope:'/ogunler/'});
 initFirebase().then(()=>{
   if(!currentUser&&profil){
     document.getElementById('onboarding').style.display='none';
