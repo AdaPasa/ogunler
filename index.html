@@ -276,6 +276,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
           <div class="app-title">🥗 <span id="h-isim">Öğün Takip</span></div>
           <div class="streak" id="streak">🔥 0 gün</div>
         </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+          <span style="font-size:12px;color:rgba(255,255,255,0.5)" id="auth-name"></span>
+          <button id="auth-btn" onclick="googleGiris()" style="font-size:12px;font-weight:600;padding:5px 12px;border:1px solid rgba(255,255,255,0.25);border-radius:20px;background:rgba(255,255,255,0.1);color:#fff;cursor:pointer">Google ile Giriş</button>
+        </div>
       </div>
       <div class="week-nav">
         <button id="prev-btn" onclick="changeWeek(-1)">&#8592;</button>
@@ -915,39 +919,64 @@ const fbConfig={
   appId:"1:668568073771:web:8a9d4528ca084263841c6e"
 };
 
-let db=null;let currentUser=null;
+let db=null,auth=null,currentUser=null;
+let _setDoc,_doc,_getDoc,_onSnapshot,_GoogleProvider,_signInWithPopup,_signOut;
 
 async function initFirebase(){
   try{
     const {initializeApp}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-    const {getFirestore,doc,setDoc,getDoc,onSnapshot}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const {getAuth,signInAnonymously,onAuthStateChanged}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-
+    const fb=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const fa=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
     const fbApp=initializeApp(fbConfig);
-    db=getFirestore(fbApp);
-    const auth=getAuth(fbApp);
+    db=fb.getFirestore(fbApp);
+    auth=fa.getAuth(fbApp);
+    _setDoc=fb.setDoc;_doc=fb.doc;_getDoc=fb.getDoc;_onSnapshot=fb.onSnapshot;
+    _GoogleProvider=fa.GoogleAuthProvider;_signInWithPopup=fa.signInWithPopup;_signOut=fa.signOut;
 
-    onAuthStateChanged(auth,async user=>{
+    fa.onAuthStateChanged(auth,async user=>{
       if(user){
         currentUser=user;
-        await syncFromFirebase(getFirestore(fbApp),getDoc,onSnapshot,doc);
+        updateAuthUI();
+        await syncFromFirebase();
       } else {
-        await signInAnonymously(auth);
+        currentUser=null;
+        updateAuthUI();
+        // Offline: local veriye bak
+        if(profil){showApp();}else{showOnboarding();}
       }
     });
-
-    window._fbSetDoc=async(path,dat)=>{
-      if(!db||!currentUser)return;
-      try{await setDoc(doc(db,'users',currentUser.uid,path,'data'),dat,{merge:true});}catch(e){console.log('FB write err',e);}
-    };
-  }catch(e){console.log('Firebase yüklenemedi, offline mod',e);}
+  }catch(e){
+    console.log('Firebase yüklenemedi',e);
+    if(profil)showApp();else showOnboarding();
+  }
 }
 
-async function syncFromFirebase(fdb,getDoc,onSnapshot,doc){
-  if(!currentUser)return;
+function updateAuthUI(){
+  const btn=document.getElementById('auth-btn');
+  if(!btn)return;
+  if(currentUser&&!currentUser.isAnonymous){
+    btn.textContent='Çıkış Yap';
+    btn.onclick=()=>_signOut(auth);
+    const nameEl=document.getElementById('auth-name');
+    if(nameEl)nameEl.textContent=currentUser.displayName||currentUser.email||'';
+  } else {
+    btn.textContent='Google ile Giriş';
+    btn.onclick=googleGiris;
+  }
+}
+
+async function googleGiris(){
   try{
-    // Profil çek
-    const pSnap=await getDoc(doc(fdb,'users',currentUser.uid,'profil','data'));
+    const provider=new _GoogleProvider();
+    await _signInWithPopup(auth,provider);
+  }catch(e){console.log('Giriş hatası',e);}
+}
+
+async function syncFromFirebase(){
+  if(!currentUser||!db)return;
+  try{
+    const uid=currentUser.uid;
+    const pSnap=await _getDoc(_doc(db,'users',uid,'profil','data'));
     if(pSnap.exists()){
       const pd=pSnap.data();
       if(pd.profil){profil=pd.profil;saveP();}
@@ -955,60 +984,49 @@ async function syncFromFirebase(fdb,getDoc,onSnapshot,doc){
       if(pd.makroH){makroH=pd.makroH;localStorage.setItem('makroH',JSON.stringify(makroH));}
       if(pd.gunKilolar){gunKilolar=pd.gunKilolar;localStorage.setItem('gunKilolar',JSON.stringify(gunKilolar));}
     }
-    // Yemek verisi çek
-    const dSnap=await getDoc(doc(fdb,'users',currentUser.uid,'ogunler','data'));
-    if(dSnap.exists()&&dSnap.data().data){
-      data=dSnap.data().data;save();}
-    // Gerçek zamanlı dinle
-    onSnapshot(doc(fdb,'users',currentUser.uid,'ogunler','data'),snap=>{
+    const dSnap=await _getDoc(_doc(db,'users',uid,'ogunler','data'));
+    if(dSnap.exists()&&dSnap.data().data){data=dSnap.data().data;save();}
+
+    _onSnapshot(_doc(db,'users',uid,'ogunler','data'),snap=>{
       if(snap.exists()&&snap.data().data){data=snap.data().data;save();if(profil){render();renderIstat();}}
     });
-    onSnapshot(doc(fdb,'users',currentUser.uid,'profil','data'),snap=>{
+    _onSnapshot(_doc(db,'users',uid,'profil','data'),snap=>{
       if(snap.exists()){
         const pd=snap.data();
         if(pd.gunKilolar){gunKilolar=pd.gunKilolar;localStorage.setItem('gunKilolar',JSON.stringify(gunKilolar));renderIstat();renderProfil();}
       }
     });
   }catch(e){console.log('Sync err',e);}
-  if(profil){document.getElementById('onboarding').style.display='none';document.getElementById('app').style.display='flex';baslat();}
-  else if(!profil){document.getElementById('onboarding').style.display='flex';}
+  if(profil)showApp();else showOnboarding();
+}
+
+function fbWrite(path,dat){
+  if(!db||!currentUser)return;
+  _setDoc(_doc(db,'users',currentUser.uid,path,'data'),dat,{merge:true}).catch(e=>console.log('FB write',e));
+}
+
+function showApp(){
+  document.getElementById('onboarding').style.display='none';
+  document.getElementById('app').style.display='flex';
+  baslat();
+}
+function showOnboarding(){
+  document.getElementById('onboarding').style.display='flex';
+  document.getElementById('app').style.display='none';
 }
 
 // Save fonksiyonlarını Firebase'e de yaz
 const _origSave=save;
-window.save=function(){
-  _origSave();
-  if(window._fbSetDoc)window._fbSetDoc('ogunler',{data});
-};
+window.save=function(){_origSave();fbWrite('ogunler',{data});};
 const _origSaveP=saveP;
-window.saveP=function(){
-  _origSaveP();
-  if(window._fbSetDoc)window._fbSetDoc('profil',{profil,gunlukHedef,makroH,gunKilolar});
-};
-
+window.saveP=function(){_origSaveP();fbWrite('profil',{profil,gunlukHedef,makroH,gunKilolar});};
 function fbSaveKilolar(){
   localStorage.setItem('gunKilolar',JSON.stringify(gunKilolar));
-  if(window._fbSetDoc)window._fbSetDoc('profil',{profil,gunlukHedef,makroH,gunKilolar});
+  fbWrite('profil',{profil,gunlukHedef,makroH,gunKilolar});
 }
 
 if('serviceWorker' in navigator)navigator.serviceWorker.register('/ogunler/service-worker.js',{scope:'/ogunler/'});
-initFirebase().then(()=>{
-  if(!currentUser&&profil){
-    document.getElementById('onboarding').style.display='none';
-    document.getElementById('app').style.display='flex';
-    baslat();
-  }
-});
-// Offline fallback
-setTimeout(()=>{
-  if(!currentUser&&profil){
-    document.getElementById('onboarding').style.display='none';
-    document.getElementById('app').style.display='flex';
-    baslat();
-  } else if(!currentUser&&!profil){
-    document.getElementById('onboarding').style.display='flex';
-  }
-},3000);
+initFirebase();
 </script>
 </body>
 </html>
