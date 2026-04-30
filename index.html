@@ -5,164 +5,213 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="theme-color" content="#1D9E75">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Öğünler">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>Haftalık Öğünler</title>
+<title>Öğün Takip</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f5;min-height:100vh;padding-bottom:2rem}
+:root{
+  --green:#1D9E75;--green-light:#E1F5EE;--green-dark:#0F6E56;
+  --blue:#378ADD;--orange:#EF9F27;--pink:#D4537E;
+  --red:#E24B4A;--bg:#0f1117;--card:#1a1d27;--card2:#22263a;
+  --border:#2a2f45;--text:#f0f0f0;--sub:#8890aa;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:3rem}
 .app{max-width:600px;margin:0 auto;padding:1rem}
-.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;padding-top:0.5rem}
-.title{font-size:20px;font-weight:600;color:#111}
-.streak{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:#B85000;background:#FEF3E2;padding:5px 12px;border-radius:20px}
-.week-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;background:#fff;border-radius:12px;padding:8px 12px;box-shadow:0 1px 3px rgba(0,0,0,0.07)}
-.week-nav button{background:none;border:none;font-size:20px;cursor:pointer;padding:4px 8px;border-radius:8px;color:#333}
-.week-nav button:active{background:#f0f0f0}
-.week-nav button:disabled{opacity:0.25;cursor:default}
-.week-label{font-size:14px;font-weight:500;color:#555}
 
-/* Kalori & Makro Kartı */
-.kalori-wrap{background:#fff;border-radius:12px;padding:12px 16px;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,0.07)}
-.kalori-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
-.kalori-title{font-size:13px;color:#666}
-.kalori-hedef-btn{font-size:12px;color:#1D9E75;background:none;border:none;cursor:pointer;font-weight:600}
-.kalori-nums{display:flex;align-items:baseline;gap:6px;margin-bottom:8px}
-.kalori-num-main{font-size:24px;font-weight:700;color:#111}
-.kalori-num-sub{font-size:13px;color:#aaa}
-.kalori-bar-track{height:8px;background:#eee;border-radius:99px;overflow:hidden}
-.kalori-bar-fill{height:100%;border-radius:99px;background:#1D9E75;transition:width 0.5s cubic-bezier(.4,0,.2,1)}
-.kalori-bar-fill.asildi{background:#E24B4A}
-.kalori-alt{display:flex;justify-content:space-between;font-size:12px;color:#bbb;margin-top:4px;margin-bottom:12px}
-.makro-row{display:flex;gap:8px;margin-top:4px}
-.makro-kart{flex:1;background:#f8f8f8;border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:3px}
-.makro-kart-label{font-size:11px;color:#aaa;font-weight:500}
-.makro-kart-val{font-size:15px;font-weight:700}
-.makro-kart-val.protein{color:#378ADD}
-.makro-kart-val.karb{color:#EF9F27}
-.makro-kart-val.yag{color:#D4537E}
-.makro-kart-bar{height:3px;border-radius:99px;background:#eee;overflow:hidden;margin-top:2px}
-.makro-kart-bar-fill{height:100%;border-radius:99px;transition:width 0.5s}
-.makro-kart-bar-fill.protein{background:#378ADD}
-.makro-kart-bar-fill.karb{background:#EF9F27}
-.makro-kart-bar-fill.yag{background:#D4537E}
+/* HEADER */
+.header{background:linear-gradient(135deg,#0f2027,#1a3a2a);border-radius:20px;padding:1.25rem 1.5rem;margin-bottom:1rem;position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(29,158,117,0.2)}
+.header::before{content:'';position:absolute;top:-40px;right:-40px;width:150px;height:150px;background:radial-gradient(circle,rgba(29,158,117,0.3),transparent 70%);border-radius:50%}
+.header::after{content:'🍽️';position:absolute;right:1.5rem;top:50%;transform:translateY(-50%);font-size:42px;opacity:0.15}
+.header-top{display:flex;align-items:center;justify-content:space-between}
+.app-title{font-size:22px;font-weight:700;color:#fff;letter-spacing:-0.5px}
+.streak{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;color:#fff;background:rgba(239,159,39,0.25);border:1px solid rgba(239,159,39,0.4);padding:5px 12px;border-radius:20px}
 
-.progress-wrap{background:#fff;border-radius:12px;padding:12px 16px;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,0.07)}
-.progress-label{display:flex;justify-content:space-between;font-size:13px;color:#666;margin-bottom:8px}
-.progress-track{height:8px;background:#eee;border-radius:99px;overflow:hidden}
-.progress-fill{height:100%;border-radius:99px;background:#1D9E75;transition:width 0.5s cubic-bezier(.4,0,.2,1)}
+/* WEEK NAV */
+.week-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;background:var(--card);border-radius:14px;padding:8px 12px;border:1px solid var(--border)}
+.week-nav button{background:none;border:none;font-size:18px;cursor:pointer;padding:6px 10px;border-radius:10px;color:var(--sub);transition:all 0.15s}
+.week-nav button:hover{background:var(--card2);color:var(--text)}
+.week-nav button:disabled{opacity:0.2;cursor:default}
+.week-label{font-size:14px;font-weight:600;color:var(--text)}
+
+/* KALORI KARTI */
+.kalori-wrap{background:linear-gradient(135deg,var(--card),var(--card2));border-radius:18px;padding:1.25rem;margin-bottom:1rem;border:1px solid var(--border);position:relative;overflow:hidden}
+.kalori-wrap::before{content:'';position:absolute;bottom:-30px;right:-30px;width:120px;height:120px;background:radial-gradient(circle,rgba(29,158,117,0.15),transparent 70%);border-radius:50%}
+.kalori-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.kalori-title{font-size:13px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:0.5px}
+.kalori-hedef-btn{font-size:12px;color:var(--green);background:var(--green-light);background:rgba(29,158,117,0.15);border:1px solid rgba(29,158,117,0.3);border-radius:10px;padding:4px 10px;cursor:pointer;font-weight:600}
+.kalori-main{display:flex;align-items:baseline;gap:6px;margin-bottom:1rem}
+.kalori-num{font-size:42px;font-weight:800;color:#fff;line-height:1;letter-spacing:-2px}
+.kalori-unit{font-size:16px;color:var(--sub);font-weight:500}
+.kalori-hedef-text{font-size:12px;color:var(--sub);margin-left:auto}
+.kalori-bar-track{height:6px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:1rem}
+.kalori-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--green),#5DCAA5);transition:width 0.6s cubic-bezier(.4,0,.2,1)}
+.kalori-bar-fill.asildi{background:linear-gradient(90deg,var(--red),#ff6b6b)}
+
+/* MAKRO KARTLAR */
+.makro-row{display:flex;gap:8px}
+.makro-kart{flex:1;background:rgba(255,255,255,0.05);border-radius:12px;padding:10px;border:1px solid var(--border)}
+.makro-icon{font-size:16px;margin-bottom:4px}
+.makro-label{font-size:10px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+.makro-val{font-size:18px;font-weight:800;margin:2px 0}
+.makro-val.p{color:var(--blue)}
+.makro-val.k{color:var(--orange)}
+.makro-val.y{color:var(--pink)}
+.makro-bar{height:3px;border-radius:99px;background:var(--border);overflow:hidden;margin-top:4px}
+.makro-bar-fill{height:100%;border-radius:99px;transition:width 0.6s}
+.makro-bar-fill.p{background:var(--blue)}
+.makro-bar-fill.k{background:var(--orange)}
+.makro-bar-fill.y{background:var(--pink)}
+
+/* PROGRESS */
+.progress-wrap{background:var(--card);border-radius:14px;padding:1rem 1.25rem;margin-bottom:1rem;border:1px solid var(--border)}
+.progress-header{display:flex;justify-content:space-between;font-size:13px;color:var(--sub);margin-bottom:8px;font-weight:500}
+.progress-track{height:6px;background:var(--border);border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--green),#5DCAA5);transition:width 0.5s}
+
+/* GÜN KARTLARI */
 .days-grid{display:flex;flex-direction:column;gap:10px}
-.day-card{background:#fff;border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,0.07);overflow:hidden;transition:border 0.2s;border:1.5px solid transparent}
-.day-card.day-done{border-color:#1D9E75;box-shadow:0 2px 8px rgba(29,158,117,0.15)}
-.day-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px}
-.day-name{font-size:14px;font-weight:600;color:#111}
-.day-mini{display:flex;gap:5px}
-.mini-dot{width:8px;height:8px;border-radius:50%;background:#ddd;transition:background 0.3s}
-.mini-dot.done{background:#1D9E75}
-.day-pct{font-size:12px;color:#999}
-.today-badge{font-size:11px;font-weight:600;color:#0F6E56;background:#E1F5EE;padding:2px 8px;border-radius:10px}
-.day-meals{padding:0 14px 12px;display:flex;flex-direction:column;gap:14px}
+.day-card{background:var(--card);border-radius:18px;border:1px solid var(--border);overflow:hidden;transition:border-color 0.3s,box-shadow 0.3s}
+.day-card.day-done{border-color:var(--green);box-shadow:0 0 20px rgba(29,158,117,0.15)}
+.day-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--card2);border-bottom:1px solid var(--border)}
+.day-left{display:flex;align-items:center;gap:8px}
+.day-name{font-size:14px;font-weight:700;color:var(--text)}
+.today-badge{font-size:10px;font-weight:700;color:var(--green-dark);background:var(--green-light);background:rgba(29,158,117,0.2);border:1px solid rgba(29,158,117,0.4);padding:2px 8px;border-radius:8px;color:var(--green)}
+.day-date{font-size:12px;color:var(--sub)}
+.day-right{display:flex;align-items:center;gap:8px}
+.day-mini{display:flex;gap:4px}
+.mini-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:background 0.3s}
+.mini-dot.done{background:var(--green)}
+.day-pct{font-size:12px;color:var(--sub);font-weight:600}
+.day-meals{padding:12px 16px;display:flex;flex-direction:column;gap:14px}
+
+/* ÖĞÜN BLOĞU */
 .meal-block{display:flex;flex-direction:column;gap:6px}
 .meal-block-header{display:flex;align-items:center;gap:10px}
-.meal-check{width:24px;height:24px;flex-shrink:0;border:2px solid #ccc;border-radius:7px;transition:all 0.18s;background:#fff;position:relative}
-.meal-check.ready{cursor:pointer;border-color:#1D9E75}
-.meal-check.ready:active{transform:scale(0.92)}
-.meal-check.checked{background:#1D9E75;border-color:#1D9E75;cursor:pointer}
-.meal-check.checked::after{content:'';position:absolute;top:50%;left:50%;width:7px;height:11px;border:2.5px solid #fff;border-top:none;border-left:none;transform:translate(-50%,-60%) rotate(45deg)}
-.meal-check.locked{opacity:0.3;cursor:not-allowed}
-.meal-label{font-size:13px;font-weight:600;color:#555;width:68px;flex-shrink:0}
-.yemek-listesi{margin-left:34px;display:flex;flex-direction:column;gap:5px}
+.meal-check{width:26px;height:26px;flex-shrink:0;border:2px solid var(--border);border-radius:8px;transition:all 0.18s;background:var(--card2);position:relative;cursor:not-allowed}
+.meal-check.ready{cursor:pointer;border-color:var(--green);box-shadow:0 0 8px rgba(29,158,117,0.3)}
+.meal-check.ready:active{transform:scale(0.9)}
+.meal-check.checked{background:var(--green);border-color:var(--green);cursor:pointer;box-shadow:0 0 12px rgba(29,158,117,0.4)}
+.meal-check.checked::after{content:'';position:absolute;top:50%;left:50%;width:7px;height:11px;border:2.5px solid #fff;border-top:none;border-left:none;transform:translate(-50%,-62%) rotate(45deg)}
+.meal-check.locked{opacity:0.25}
+.meal-emoji{font-size:18px}
+.meal-label{font-size:14px;font-weight:700;color:var(--text)}
+
+/* YEMEK LİSTESİ */
+.yemek-listesi{margin-left:36px;display:flex;flex-direction:column;gap:6px}
 .yemek-satir{display:flex;align-items:center;gap:6px}
-.yemek-input{flex:1;border:1.5px solid #eee;border-radius:10px;padding:7px 10px;font-size:14px;background:#f8f8f8;color:#111;outline:none;-webkit-appearance:none;min-width:0}
-.yemek-input:focus{border-color:#1D9E75;background:#fff}
-.yemek-input.done-input{text-decoration:line-through;color:#aaa}
-.kcal-badge{font-size:11px;font-weight:600;color:#1D9E75;background:#E1F5EE;padding:2px 7px;border-radius:8px;white-space:nowrap;flex-shrink:0}
-.sil-btn{width:20px;height:20px;border-radius:50%;background:#f0f0f0;color:#aaa;border:none;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.sil-btn:active{background:#fdd;color:#E24B4A}
-.ekle-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;font-size:12px;color:#1D9E75;background:none;border:1.5px dashed #1D9E75;border-radius:10px;cursor:pointer;width:fit-content;margin-top:2px}
-.ekle-btn:active{background:#E1F5EE}
+.yemek-input{flex:1;border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:14px;background:var(--card2);color:var(--text);outline:none;min-width:0;transition:border-color 0.2s}
+.yemek-input::placeholder{color:var(--sub)}
+.yemek-input:focus{border-color:var(--green)}
+.yemek-input.done-input{text-decoration:line-through;color:var(--sub)}
+.kcal-badge{font-size:11px;font-weight:700;color:var(--green);background:rgba(29,158,117,0.15);border:1px solid rgba(29,158,117,0.3);padding:3px 8px;border-radius:8px;white-space:nowrap;flex-shrink:0}
+.bilinmiyor{font-size:11px;color:var(--sub);flex-shrink:0}
+.sil-btn{width:22px;height:22px;border-radius:50%;background:var(--card2);color:var(--sub);border:1px solid var(--border);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s}
+.sil-btn:hover{background:rgba(226,75,74,0.2);color:var(--red);border-color:var(--red)}
 
-/* Besin detayı */
-.besin-detay{font-size:11px;color:#aaa;display:flex;gap:8px;margin-top:1px;padding-left:2px}
-.besin-detay span{display:flex;align-items:center;gap:2px}
-.bd-p{color:#378ADD}
-.bd-k{color:#EF9F27}
-.bd-y{color:#D4537E}
+.besin-detay{font-size:11px;color:var(--sub);display:flex;gap:8px;padding-left:2px}
+.bd-p{color:var(--blue)}
+.bd-k{color:var(--orange)}
+.bd-y{color:var(--pink)}
 
-.meal-toplam-wrap{margin-left:34px;margin-top:2px;padding:6px 10px;background:#f8f8f8;border-radius:8px;display:none}
+.ekle-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;font-size:12px;color:var(--green);background:rgba(29,158,117,0.1);border:1px dashed rgba(29,158,117,0.4);border-radius:10px;cursor:pointer;width:fit-content;margin-top:2px;margin-left:36px;font-weight:600;transition:all 0.15s}
+.ekle-btn:hover{background:rgba(29,158,117,0.2)}
+
+/* ÖĞÜN TOPLAM */
+.meal-toplam-wrap{margin-left:36px;margin-top:4px;padding:8px 12px;background:rgba(29,158,117,0.08);border:1px solid rgba(29,158,117,0.2);border-radius:10px;display:none}
 .meal-toplam-wrap.visible{display:block}
-.meal-toplam-kcal{font-size:12px;font-weight:600;color:#333;margin-bottom:4px}
-.meal-toplam-makro{display:flex;gap:10px;font-size:11px}
-.meal-toplam-makro span{font-weight:600}
+.meal-toplam-kcal{font-size:12px;font-weight:700;color:var(--green);margin-bottom:3px}
+.meal-toplam-makro{display:flex;gap:10px;font-size:11px;font-weight:600}
 
-.photo-area{margin-left:34px;display:flex;align-items:center;gap:8px;margin-top:6px}
-.photo-cam-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;font-size:12px;color:#666;border:1.5px dashed #ccc;border-radius:10px;cursor:pointer;background:#f8f8f8}
-.photo-cam-btn:active{background:#eee}
+/* FOTOĞRAF */
+.photo-area{margin-left:36px;display:flex;align-items:center;gap:8px;margin-top:4px}
+.photo-cam-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;font-size:12px;color:var(--sub);border:1px dashed var(--border);border-radius:10px;cursor:pointer;background:var(--card2);transition:all 0.15s}
+.photo-cam-btn:hover{border-color:var(--green);color:var(--green)}
 .photo-thumb-wrap{position:relative;display:inline-block}
-.photo-thumb{width:56px;height:56px;object-fit:cover;border-radius:10px;border:1.5px solid #eee}
-.photo-del{position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#E24B4A;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none}
-.hint{font-size:11px;color:#E24B4A;transition:opacity 0.3s}
-.lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:9999;padding:1rem}
+.photo-thumb{width:60px;height:60px;object-fit:cover;border-radius:10px;border:2px solid var(--green);cursor:pointer}
+.photo-del{position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:var(--red);color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none}
+
+.hint{font-size:11px;color:var(--red);transition:opacity 0.3s;margin-left:36px;display:block;min-height:16px}
+
+/* MODAL */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:9999;padding:1rem}
 .lightbox img{max-width:100%;max-height:85vh;border-radius:12px;object-fit:contain}
-.hedef-modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:10000;padding:1rem}
-.hedef-box{background:#fff;border-radius:16px;padding:1.5rem;width:100%;max-width:300px}
-.hedef-box h3{font-size:16px;font-weight:600;margin-bottom:1rem;color:#111}
-.hedef-box input{width:100%;border:1.5px solid #eee;border-radius:10px;padding:10px;font-size:16px;text-align:center;outline:none}
-.hedef-box input:focus{border-color:#1D9E75}
-.hedef-box button{width:100%;margin-top:12px;padding:12px;border:none;border-radius:10px;background:#1D9E75;color:#fff;font-size:15px;font-weight:600;cursor:pointer}
-.hedef-box .iptal{background:#f5f5f5;color:#666;margin-top:8px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;z-index:10000;padding:1rem}
+.modal-box{background:var(--card);border-radius:20px;width:100%;max-width:420px;overflow:hidden;border:1px solid var(--border)}
+.modal-title{padding:14px 16px;font-size:13px;color:var(--sub);text-align:center;border-bottom:1px solid var(--border)}
+.modal-btn{width:100%;padding:16px;border:none;background:transparent;font-size:15px;cursor:pointer;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--border);color:var(--text);transition:background 0.15s}
+.modal-btn:hover{background:var(--card2)}
+.modal-cancel{width:100%;padding:16px;border:none;background:transparent;font-size:15px;cursor:pointer;color:var(--red);font-weight:700}
+.hedef-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:10000;padding:1rem}
+.hedef-box{background:var(--card);border-radius:20px;padding:1.5rem;width:100%;max-width:300px;border:1px solid var(--border)}
+.hedef-box h3{font-size:16px;font-weight:700;margin-bottom:1rem;color:var(--text);text-align:center}
+.hedef-box input{width:100%;border:1px solid var(--border);border-radius:12px;padding:12px;font-size:20px;text-align:center;outline:none;background:var(--card2);color:var(--text)}
+.hedef-box input:focus{border-color:var(--green)}
+.hedef-box .kaydet-btn{width:100%;margin-top:12px;padding:14px;border:none;border-radius:12px;background:var(--green);color:#fff;font-size:15px;font-weight:700;cursor:pointer}
+.hedef-box .iptal-btn{width:100%;margin-top:8px;padding:12px;border:none;border-radius:12px;background:var(--card2);color:var(--sub);font-size:14px;cursor:pointer}
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="top-bar">
-    <div class="title">Haftalık Öğünler</div>
-    <div class="streak" id="streak-badge">🔥 0 gün seri</div>
+  <div class="header">
+    <div class="header-top">
+      <div class="app-title">🥗 Öğün Takip</div>
+      <div class="streak" id="streak-badge">🔥 0 gün</div>
+    </div>
   </div>
+
   <div class="week-nav">
     <button id="prev-btn" onclick="changeWeek(-1)">&#8592;</button>
     <span class="week-label" id="week-label"></span>
     <button onclick="changeWeek(1)">&#8594;</button>
   </div>
+
   <div class="kalori-wrap">
     <div class="kalori-header">
-      <span class="kalori-title">Bugünkü özet</span>
-      <button class="kalori-hedef-btn" onclick="hedefAc()">Hedef: <span id="hedef-goster">2000</span> kcal</button>
+      <span class="kalori-title">Bugünkü Özet</span>
+      <button class="kalori-hedef-btn" onclick="hedefAc()">🎯 Hedef: <span id="hedef-goster">2000</span> kcal</button>
     </div>
-    <div class="kalori-nums">
-      <span class="kalori-num-main" id="kalori-toplam">0</span>
-      <span class="kalori-num-sub">kcal</span>
+    <div class="kalori-main">
+      <span class="kalori-num" id="kalori-toplam">0</span>
+      <span class="kalori-unit">kcal</span>
+      <span class="kalori-hedef-text">/ <span id="hedef-goster2">2000</span> kcal</span>
     </div>
     <div class="kalori-bar-track"><div class="kalori-bar-fill" id="kalori-bar" style="width:0%"></div></div>
-    <div class="kalori-alt"><span>0</span><span id="kalori-hedef-alt">2000 kcal hedef</span></div>
     <div class="makro-row">
       <div class="makro-kart">
-        <span class="makro-kart-label">Protein</span>
-        <span class="makro-kart-val protein" id="m-protein">0g</span>
-        <div class="makro-kart-bar"><div class="makro-kart-bar-fill protein" id="mb-protein" style="width:0%"></div></div>
+        <div class="makro-icon">💪</div>
+        <div class="makro-label">Protein</div>
+        <div class="makro-val p" id="m-protein">0g</div>
+        <div class="makro-bar"><div class="makro-bar-fill p" id="mb-protein" style="width:0%"></div></div>
       </div>
       <div class="makro-kart">
-        <span class="makro-kart-label">Karbonhidrat</span>
-        <span class="makro-kart-val karb" id="m-karb">0g</span>
-        <div class="makro-kart-bar"><div class="makro-kart-bar-fill karb" id="mb-karb" style="width:0%"></div></div>
+        <div class="makro-icon">⚡</div>
+        <div class="makro-label">Karbonhidrat</div>
+        <div class="makro-val k" id="m-karb">0g</div>
+        <div class="makro-bar"><div class="makro-bar-fill k" id="mb-karb" style="width:0%"></div></div>
       </div>
       <div class="makro-kart">
-        <span class="makro-kart-label">Yağ</span>
-        <span class="makro-kart-val yag" id="m-yag">0g</span>
-        <div class="makro-kart-bar"><div class="makro-kart-bar-fill yag" id="mb-yag" style="width:0%"></div></div>
+        <div class="makro-icon">🥑</div>
+        <div class="makro-label">Yağ</div>
+        <div class="makro-val y" id="m-yag">0g</div>
+        <div class="makro-bar"><div class="makro-bar-fill y" id="mb-yag" style="width:0%"></div></div>
       </div>
     </div>
   </div>
+
   <div class="progress-wrap">
-    <div class="progress-label"><span>Haftalık ilerleme</span><span id="prog-text">0 / 0</span></div>
+    <div class="progress-header"><span>Haftalık İlerleme</span><span id="prog-text">0 / 0</span></div>
     <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
   </div>
+
   <div class="days-grid" id="days-grid"></div>
 </div>
 
 <script>
 const DAYS=['Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi','Pazar'];
+const MEAL_EMOJIS=['☀️','🌤️','🌙'];
 const MEALS=['Kahvaltı','Öğle','Akşam'];
 const START_DATE=new Date(2026,3,29);
 START_DATE.setHours(0,0,0,0);
@@ -170,9 +219,8 @@ START_DATE.setHours(0,0,0,0);
 let weekOffset=0;
 let data=JSON.parse(localStorage.getItem('ogunler')||'{}');
 let gunlukHedef=parseInt(localStorage.getItem('kaloriHedef')||'2000');
-function save(){localStorage.setItem('ogunler',JSON.stringify(data));}
+function save(){try{localStorage.setItem('ogunler',JSON.stringify(data));}catch(e){}}
 
-// ── VERİTABANI: {isimler, birim, kcal, p(protein), k(karb), y(yag)} — 100 birim başına
 const BESINLER=[
   {isimler:['yumurta','egg'],birim:'adet',kcal:78,p:6.3,k:0.6,y:5.3},
   {isimler:['yumurta beyazı','yumurta akı','egg white'],birim:'adet',kcal:17,p:3.6,k:0.2,y:0.1},
@@ -182,19 +230,15 @@ const BESINLER=[
   {isimler:['pirinç unu','rice flour'],birim:'gram',kcal:3.66,p:0.06,k:0.8,y:0.014},
   {isimler:['yulaf','yulaf ezmesi','oat','oatmeal'],birim:'gram',kcal:3.89,p:0.017,k:0.066,y:0.007},
   {isimler:['buğday unu','un','flour'],birim:'gram',kcal:3.64,p:0.01,k:0.076,y:0.001},
-  {isimler:['tam buğday unu','whole wheat flour'],birim:'gram',kcal:3.40,p:0.013,k:0.072,y:0.019},
   {isimler:['makarna','pasta'],birim:'gram',kcal:1.31,p:0.05,k:0.25,y:0.011},
   {isimler:['ekmek','bread'],birim:'gram',kcal:2.65,p:0.09,k:0.049,y:0.032},
-  {isimler:['tam buğday ekmek','whole wheat bread'],birim:'gram',kcal:2.47,p:0.089,k:0.041,y:0.034},
   {isimler:['tavuk göğüs','tavuk göğsü','chicken breast'],birim:'gram',kcal:1.65,p:0.031,k:0,y:0.036},
   {isimler:['tavuk but','chicken thigh'],birim:'gram',kcal:2.09,p:0.026,k:0,y:0.109},
   {isimler:['kıyma','ground beef'],birim:'gram',kcal:2.54,p:0.017,k:0,y:0.2},
-  {isimler:['biftek','steak','dana'],birim:'gram',kcal:2.71,p:0.026,k:0,y:0.19},
   {isimler:['somon','salmon'],birim:'gram',kcal:2.08,p:0.02,k:0,y:0.13},
   {isimler:['ton balığı','tuna'],birim:'gram',kcal:1.16,p:0.026,k:0,y:0.001},
   {isimler:['hindi göğsü','turkey breast'],birim:'gram',kcal:1.35,p:0.03,k:0,y:0.01},
   {isimler:['süt','milk'],birim:'ml',kcal:0.42,p:0.003,k:0.005,y:0.001},
-  {isimler:['yağsız süt','skim milk'],birim:'ml',kcal:0.34,p:0.003,k:0.005,y:0},
   {isimler:['yoğurt','yogurt'],birim:'gram',kcal:0.59,p:0.01,k:0.038,y:0.032},
   {isimler:['yağsız yoğurt','low fat yogurt'],birim:'gram',kcal:0.56,p:0.01,k:0.042,y:0.002},
   {isimler:['lor peyniri','cottage cheese'],birim:'gram',kcal:0.98,p:0.011,k:0.033,y:0.043},
@@ -213,296 +257,206 @@ const BESINLER=[
   {isimler:['orman meyvesi','karışık orman meyvesi','mixed berries'],birim:'gram',kcal:0.57,p:0.008,k:0.014,y:0.003},
   {isimler:['çilek','strawberry'],birim:'gram',kcal:0.32,p:0.007,k:0.008,y:0.003},
   {isimler:['yaban mersini','blueberry'],birim:'gram',kcal:0.57,p:0.007,k:0.014,y:0.003},
-  {isimler:['ahududu','raspberry'],birim:'gram',kcal:0.52,p:0.012,k:0.012,y:0.007},
   {isimler:['muz','banana'],birim:'adet',kcal:89,p:1.1,k:23,y:0.3},
   {isimler:['elma','apple'],birim:'adet',kcal:72,p:0.4,k:19,y:0.2},
-  {isimler:['portakal','orange'],birim:'adet',kcal:62,p:1.2,k:15,y:0.2},
   {isimler:['brokoli','broccoli'],birim:'gram',kcal:0.34,p:0.028,k:0.007,y:0.004},
   {isimler:['ıspanak','spinach'],birim:'gram',kcal:0.23,p:0.029,k:0.004,y:0.004},
-  {isimler:['domates','tomato'],birim:'gram',kcal:0.18,p:0.009,k:0.004,y:0.002},
-  {isimler:['salatalık','cucumber'],birim:'gram',kcal:0.15,p:0.007,k:0.004,y:0.001},
-  {isimler:['havuç','carrot'],birim:'gram',kcal:0.41,p:0.009,k:0.01,y:0.002},
   {isimler:['patates','potato'],birim:'gram',kcal:0.77,p:0.02,k:0.017,y:0.001},
   {isimler:['tatlı patates','sweet potato'],birim:'gram',kcal:0.86,p:0.016,k:0.02,y:0.001},
   {isimler:['whey protein','protein tozu','protein powder'],birim:'gram',kcal:4.0,p:0.08,k:0.04,y:0.02},
   {isimler:['kazein','casein'],birim:'gram',kcal:3.6,p:0.072,k:0.032,y:0.016},
   {isimler:['bal','honey'],birim:'gram',kcal:3.04,p:0.003,k:0.082,y:0},
-  {isimler:['kakao','cocoa'],birim:'gram',kcal:2.28,p:0.02,k:0.058,y:0.014},
   {isimler:['dark çikolata','bitter çikolata'],birim:'gram',kcal:5.46,p:0.049,k:0.06,y:0.031},
 ];
 
 function parseGirdi(girdi){
   if(!girdi||!girdi.trim()) return null;
-  const temiz=girdi.trim().toLowerCase()
-    .replace('tavuk göğsü','tavuk göğüs');
+  const temiz=girdi.trim().toLowerCase().replace('tavuk göğsü','tavuk göğüs');
   let miktar=1,besinAdi=temiz;
   const m1=temiz.match(/^([\d.,]+)\s*(gram|gr|g\b|kg|ml|lt\b|l\b|yemek\s*kaşığı|yk|çay\s*kaşığı|ck|adet|tane|porsiyon|dilim|bardak)\s+(.+)$/);
   const m2=temiz.match(/^([\d.,]+)\s+(.+)$/);
   if(m1){
     miktar=parseFloat(m1[1].replace(',','.'))||1;
-    const birim=m1[2].trim();
+    const b=m1[2].trim();
     besinAdi=m1[3].trim();
-    if(birim==='kg') miktar*=1000;
-    if(birim==='lt'||birim==='l') miktar*=1000;
-    if(birim==='yemek kaşığı'||birim==='yk') miktar*=15;
-    if(birim==='çay kaşığı'||birim==='ck') miktar*=5;
-  } else if(m2){
-    miktar=parseFloat(m2[1].replace(',','.'))||1;
-    besinAdi=m2[2].trim();
-  }
+    if(b==='kg') miktar*=1000;
+    if(b==='lt'||b==='l') miktar*=1000;
+    if(b==='yemek kaşığı'||b==='yk') miktar*=15;
+    if(b==='çay kaşığı'||b==='ck') miktar*=5;
+  } else if(m2){miktar=parseFloat(m2[1].replace(',','.'))||1;besinAdi=m2[2].trim();}
   let bulunan=null,enUzun=0;
-  for(const b of BESINLER){
-    for(const isim of b.isimler){
-      if(besinAdi.includes(isim)&&isim.length>enUzun){bulunan=b;enUzun=isim.length;}
-    }
-  }
+  for(const b of BESINLER) for(const isim of b.isimler)
+    if(besinAdi.includes(isim)&&isim.length>enUzun){bulunan=b;enUzun=isim.length;}
   if(!bulunan) return null;
-  return {
-    kcal:Math.round(miktar*bulunan.kcal),
-    p:Math.round(miktar*bulunan.p*10)/10,
-    k:Math.round(miktar*bulunan.k*10)/10,
-    y:Math.round(miktar*bulunan.y*10)/10,
-  };
+  return{kcal:Math.round(miktar*bulunan.kcal),p:Math.round(miktar*bulunan.p*10)/10,k:Math.round(miktar*bulunan.k*10)/10,y:Math.round(miktar*bulunan.y*10)/10};
 }
 
-// ── TARİH ──
-function getMonday(d,offset=0){
-  const dt=new Date(d);const day=dt.getDay();
-  const diff=dt.getDate()-(day===0?6:day-1);
-  dt.setDate(diff+offset*7);dt.setHours(0,0,0,0);return dt;
-}
-function getWeekDates(offset){
-  const mon=getMonday(new Date(),offset);
-  return DAYS.map((_,i)=>{const d=new Date(mon);d.setDate(mon.getDate()+i);return d;});
-}
+function getMonday(d,offset=0){const dt=new Date(d);const day=dt.getDay();dt.setDate(dt.getDate()-(day===0?6:day-1)+offset*7);dt.setHours(0,0,0,0);return dt;}
+function getWeekDates(offset){const mon=getMonday(new Date(),offset);return DAYS.map((_,i)=>{const d=new Date(mon);d.setDate(mon.getDate()+i);return d;});}
 function isToday(d){const t=new Date();return d.getDate()===t.getDate()&&d.getMonth()===t.getMonth()&&d.getFullYear()===t.getFullYear();}
 function fmt(d){return d.toLocaleDateString('tr-TR',{day:'numeric',month:'short'});}
-function weekKey(offset){return getMonday(new Date(),offset).toISOString().slice(0,10);}
+function weekKey(o){return getMonday(new Date(),o).toISOString().slice(0,10);}
 function getState(){const wk=weekKey(weekOffset);if(!data[wk])data[wk]={meals:{},yemekler:{},photos:{}};return data[wk];}
-function getMinWeekOffset(){
-  const todayMon=getMonday(new Date(),0);const startMon=getMonday(START_DATE,0);
-  return Math.round((startMon-todayMon)/(7*86400000));
-}
-function changeWeek(d){
-  const minOff=getMinWeekOffset();const next=weekOffset+d;
-  if(next<minOff) return;weekOffset=next;render();
-}
+function getMinWeekOffset(){return Math.round((getMonday(START_DATE,0)-getMonday(new Date(),0))/(7*86400000));}
+function changeWeek(d){const minOff=getMinWeekOffset();const next=weekOffset+d;if(next<minOff)return;weekOffset=next;render();}
 
-// ── YEMEK LİSTESİ ──
-function getYemekler(di,mi){
-  const st=getState();
-  if(!st.yemekler) st.yemekler={};
-  if(!st.yemekler[`${di}-${mi}`]) st.yemekler[`${di}-${mi}`]=[{ad:'',kcal:null,p:null,k:null,y:null}];
-  return st.yemekler[`${di}-${mi}`];
-}
+function getYemekler(di,mi){const st=getState();if(!st.yemekler)st.yemekler={};if(!st.yemekler[`${di}-${mi}`])st.yemekler[`${di}-${mi}`]=[{ad:'',kcal:null,p:null,k:null,y:null}];return st.yemekler[`${di}-${mi}`];}
+
 function yemekEkle(di,mi){
   getYemekler(di,mi).push({ad:'',kcal:null,p:null,k:null,y:null});
   save();render();
-  setTimeout(()=>{
-    const inputs=document.querySelectorAll(`#ylist-${di}-${mi} .yemek-input`);
-    if(inputs.length) inputs[inputs.length-1].focus();
-  },50);
+  setTimeout(()=>{const inp=document.querySelectorAll(`#ylist-${di}-${mi} .yemek-input`);if(inp.length)inp[inp.length-1].focus();},50);
 }
 function yemekSil(di,mi,idx){
-  const liste=getYemekler(di,mi);
-  liste.splice(idx,1);
-  if(liste.length===0) liste.push({ad:'',kcal:null,p:null,k:null,y:null});
-  getState().meals[`${di}-${mi}`]=false;
-  save();render();
+  const liste=getYemekler(di,mi);liste.splice(idx,1);
+  if(liste.length===0)liste.push({ad:'',kcal:null,p:null,k:null,y:null});
+  getState().meals[`${di}-${mi}`]=false;save();render();
 }
 function yemekAdDegis(di,mi,idx,val){
-  getYemekler(di,mi)[idx].ad=val;
-  save();
+  getYemekler(di,mi)[idx].ad=val;save();
   const chk=document.getElementById(`chk-${di}-${mi}`);
-  if(chk&&!getState().meals[`${di}-${mi}`]){
-    chk.className='meal-check '+(canCheck(di,mi)?'ready':'locked');
-  }
+  if(chk&&!getState().meals[`${di}-${mi}`])chk.className='meal-check '+(canCheck(di,mi)?'ready':'locked');
 }
 function yemekBlur(di,mi,idx,val){
-  if(!val.trim()) return;
+  if(!val.trim())return;
   getYemekler(di,mi)[idx].ad=val;
   const sonuc=parseGirdi(val);
+  const el=document.getElementById(`kcal-badge-${di}-${mi}-${idx}`);
+  const det=document.getElementById(`det-${di}-${mi}-${idx}`);
   if(sonuc){
     const y=getYemekler(di,mi)[idx];
-    y.kcal=sonuc.kcal;y.p=sonuc.p;y.k=sonuc.k;y.y=sonuc.y;
-    save();
-    // Badge güncelle
-    const el=document.getElementById(`kcal-badge-${di}-${mi}-${idx}`);
+    y.kcal=sonuc.kcal;y.p=sonuc.p;y.k=sonuc.k;y.y=sonuc.y;save();
     if(el){el.className='kcal-badge';el.textContent='~'+sonuc.kcal+' kcal';}
-    // Detay güncelle
-    const det=document.getElementById(`det-${di}-${mi}-${idx}`);
-    if(det){
-      det.innerHTML=`<span class="bd-p">P: ${sonuc.p}g</span><span class="bd-k">K: ${sonuc.k}g</span><span class="bd-y">Y: ${sonuc.y}g</span>`;
-    }
-    kaloriGuncelle();
-    mealToplamGuncelle(di,mi);
-    const chk=document.getElementById(`chk-${di}-${mi}`);
-    if(chk&&!getState().meals[`${di}-${mi}`]){
-      chk.className='meal-check '+(canCheck(di,mi)?'ready':'locked');
-    }
+    if(det)det.innerHTML=`<span class="bd-p">P:${sonuc.p}g</span><span class="bd-k">K:${sonuc.k}g</span><span class="bd-y">Y:${sonuc.y}g</span>`;
   } else {
-    const el=document.getElementById(`kcal-badge-${di}-${mi}-${idx}`);
-    if(el){el.className='';el.textContent='bilinmiyor';}
+    if(el){el.className='bilinmiyor';el.textContent='?';}
   }
+  kaloriGuncelle();
+  mealToplamGuncelle(di,mi);
+  const chk=document.getElementById(`chk-${di}-${mi}`);
+  if(chk&&!getState().meals[`${di}-${mi}`])chk.className='meal-check '+(canCheck(di,mi)?'ready':'locked');
 }
 
 function mealToplamGuncelle(di,mi){
   const liste=getYemekler(di,mi);
   const kcal=liste.reduce((s,y)=>s+(y.kcal||0),0);
-  const p=liste.reduce((s,y)=>s+(y.p||0),0);
-  const k=liste.reduce((s,y)=>s+(y.k||0),0);
-  const yg=liste.reduce((s,y)=>s+(y.y||0),0);
+  const p=Math.round(liste.reduce((s,y)=>s+(y.p||0),0)*10)/10;
+  const k=Math.round(liste.reduce((s,y)=>s+(y.k||0),0)*10)/10;
+  const yg=Math.round(liste.reduce((s,y)=>s+(y.y||0),0)*10)/10;
   const wrap=document.getElementById(`meal-toplam-${di}-${mi}`);
-  if(!wrap) return;
+  if(!wrap)return;
   if(kcal>0){
     wrap.className='meal-toplam-wrap visible';
-    wrap.innerHTML=`<div class="meal-toplam-kcal">Toplam: ${kcal} kcal</div>
-    <div class="meal-toplam-makro">
-      <span class="bd-p">P: ${Math.round(p*10)/10}g</span>
-      <span class="bd-k">K: ${Math.round(k*10)/10}g</span>
-      <span class="bd-y">Y: ${Math.round(yg*10)/10}g</span>
-    </div>`;
-  } else {
-    wrap.className='meal-toplam-wrap';wrap.innerHTML='';
-  }
+    wrap.innerHTML=`<div class="meal-toplam-kcal">⚡ ${kcal} kcal</div>
+    <div class="meal-toplam-makro"><span class="bd-p">💪 ${p}g</span><span class="bd-k">⚡ ${k}g</span><span class="bd-y">🥑 ${yg}g</span></div>`;
+  } else {wrap.className='meal-toplam-wrap';wrap.innerHTML='';}
 }
 
-// ── KALORİ & MAKRO BAR ──
 function kaloriGuncelle(){
-  document.getElementById('hedef-goster').textContent=gunlukHedef;
-  document.getElementById('kalori-hedef-alt').textContent=gunlukHedef+' kcal hedef';
   const today=new Date();today.setHours(0,0,0,0);
   const dates=getWeekDates(weekOffset);
   let kcal=0,p=0,k=0,yg=0;
   dates.forEach((date,di)=>{
     const d2=new Date(date);d2.setHours(0,0,0,0);
-    if(d2.getTime()!==today.getTime()) return;
-    MEALS.forEach((_,mi)=>{
-      getYemekler(di,mi).forEach(y=>{
-        if(y.kcal) kcal+=y.kcal;
-        if(y.p) p+=y.p;
-        if(y.k) k+=y.k;
-        if(y.y) yg+=y.y;
-      });
-    });
+    if(d2.getTime()!==today.getTime())return;
+    MEALS.forEach((_,mi)=>getYemekler(di,mi).forEach(y=>{
+      if(y.kcal)kcal+=y.kcal;if(y.p)p+=y.p;if(y.k)k+=y.k;if(y.y)yg+=y.y;
+    }));
   });
   document.getElementById('kalori-toplam').textContent=kcal;
+  document.getElementById('hedef-goster').textContent=gunlukHedef;
+  document.getElementById('hedef-goster2').textContent=gunlukHedef;
   const pct=Math.min(100,Math.round(kcal/gunlukHedef*100));
   const bar=document.getElementById('kalori-bar');
-  bar.style.width=pct+'%';
-  bar.className='kalori-bar-fill'+(kcal>gunlukHedef?' asildi':'');
+  bar.style.width=pct+'%';bar.className='kalori-bar-fill'+(kcal>gunlukHedef?' asildi':'');
   document.getElementById('m-protein').textContent=Math.round(p*10)/10+'g';
   document.getElementById('m-karb').textContent=Math.round(k*10)/10+'g';
   document.getElementById('m-yag').textContent=Math.round(yg*10)/10+'g';
-  // Makro barları (hedef: P=150g, K=250g, Y=70g)
   document.getElementById('mb-protein').style.width=Math.min(100,p/1.5)+'%';
   document.getElementById('mb-karb').style.width=Math.min(100,k/2.5)+'%';
   document.getElementById('mb-yag').style.width=Math.min(100,yg/0.7)+'%';
 }
+
 function hedefAc(){
-  const modal=document.createElement('div');modal.className='hedef-modal';
-  modal.innerHTML=`<div class="hedef-box">
-    <h3>Günlük kalori hedefi</h3>
+  const ov=document.createElement('div');ov.className='hedef-modal-overlay';
+  ov.innerHTML=`<div class="hedef-box"><h3>🎯 Günlük Kalori Hedefi</h3>
     <input type="number" id="hedef-input" value="${gunlukHedef}" min="500" max="9999">
-    <button onclick="hedefKaydet()">Kaydet</button>
-    <button class="iptal" onclick="this.closest('.hedef-modal').remove()">İptal</button>
+    <button class="kaydet-btn" onclick="hedefKaydet()">Kaydet</button>
+    <button class="iptal-btn" onclick="this.closest('.hedef-modal-overlay').remove()">İptal</button>
   </div>`;
-  document.body.appendChild(modal);
+  document.body.appendChild(ov);
   setTimeout(()=>document.getElementById('hedef-input').focus(),100);
 }
 function hedefKaydet(){
   const v=parseInt(document.getElementById('hedef-input').value);
-  if(!v||v<500) return;
+  if(!v||v<500)return;
   gunlukHedef=v;localStorage.setItem('kaloriHedef',v);
-  document.querySelector('.hedef-modal').remove();
+  document.querySelector('.hedef-modal-overlay').remove();
   kaloriGuncelle();
 }
 
-// ── FOTOĞRAF ──
-function fotografSikistir(dataUrl,callback){
-  const img=new Image();
-  img.onload=()=>{
-    const canvas=document.createElement('canvas');
-    const max=800;let w=img.width,h=img.height;
+function fotografSikistir(dataUrl,cb){
+  const img=new Image();img.onload=()=>{
+    const c=document.createElement('canvas');const max=800;
+    let w=img.width,h=img.height;
     if(w>max||h>max){if(w>h){h=Math.round(h*max/w);w=max;}else{w=Math.round(w*max/h);h=max;}}
-    canvas.width=w;canvas.height=h;
-    canvas.getContext('2d').drawImage(img,0,0,w,h);
-    callback(canvas.toDataURL('image/jpeg',0.7));
+    c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
+    cb(c.toDataURL('image/jpeg',0.7));
   };img.src=dataUrl;
 }
 function fotoMenuAc(di,mi){
-  const old=document.getElementById('foto-menu-overlay');if(old) old.remove();
-  const overlay=document.createElement('div');
-  overlay.id='foto-menu-overlay';
-  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:flex-end;justify-content:center;z-index:10000;padding:1rem';
-  overlay.innerHTML=`<div style="background:#fff;border-radius:16px;width:100%;max-width:400px;overflow:hidden;margin-bottom:8px">
-    <div style="padding:12px 16px;border-bottom:1px solid #f0f0f0;font-size:13px;color:#999;text-align:center">Fotoğraf ekle</div>
-    <button onclick="fotoSec(${di},${mi},'kamera')" style="width:100%;padding:16px;border:none;background:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;gap:12px;border-bottom:1px solid #f0f0f0"><span style="font-size:22px">📷</span> Kamera ile çek</button>
-    <button onclick="fotoSec(${di},${mi},'galeri')" style="width:100%;padding:16px;border:none;background:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;gap:12px;border-bottom:1px solid #f0f0f0"><span style="font-size:22px">🖼️</span> Galeriden seç</button>
-    <button onclick="document.getElementById('foto-menu-overlay').remove()" style="width:100%;padding:16px;border:none;background:#f8f8f8;font-size:16px;cursor:pointer;color:#E24B4A;font-weight:600">İptal</button>
+  const old=document.getElementById('foto-ov');if(old)old.remove();
+  const ov=document.createElement('div');ov.id='foto-ov';ov.className='modal-overlay';
+  ov.innerHTML=`<div class="modal-box">
+    <div class="modal-title">Fotoğraf Ekle</div>
+    <button class="modal-btn" onclick="fotoSec(${di},${mi},'kamera')"><span style="font-size:24px">📷</span><span>Kamera ile çek</span></button>
+    <button class="modal-btn" onclick="fotoSec(${di},${mi},'galeri')"><span style="font-size:24px">🖼️</span><span>Galeriden seç</span></button>
+    <button class="modal-cancel" onclick="document.getElementById('foto-ov').remove()">İptal</button>
   </div>`;
-  overlay.onclick=e=>{if(e.target===overlay) overlay.remove();};
-  document.body.appendChild(overlay);
+  ov.onclick=e=>{if(e.target===ov)ov.remove();};
+  document.body.appendChild(ov);
 }
 function fotoSec(di,mi,kaynak){
-  const overlay=document.getElementById('foto-menu-overlay');if(overlay) overlay.remove();
-  const inp=document.createElement('input');
-  inp.type='file';inp.accept='image/*';
-  if(kaynak==='kamera') inp.setAttribute('capture','environment');
+  const ov=document.getElementById('foto-ov');if(ov)ov.remove();
+  const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
+  if(kaynak==='kamera')inp.setAttribute('capture','environment');
   inp.onchange=e=>{
-    const file=e.target.files[0];if(!file) return;
-    const reader=new FileReader();
-    reader.onload=ev=>{
-      fotografSikistir(ev.target.result,(s)=>{
-        getState().photos[`${di}-${mi}`]=s;save();render();
-      });
-    };
-    reader.readAsDataURL(file);
+    const file=e.target.files[0];if(!file)return;
+    const r=new FileReader();
+    r.onload=ev=>fotografSikistir(ev.target.result,s=>{getState().photos[`${di}-${mi}`]=s;save();render();});
+    r.readAsDataURL(file);
   };inp.click();
 }
-function removePhoto(di,mi){
-  delete getState().photos[`${di}-${mi}`];
-  getState().meals[`${di}-${mi}`]=false;
-  save();render();
-}
+function removePhoto(di,mi){delete getState().photos[`${di}-${mi}`];save();render();}
 function openLightbox(src){
   const lb=document.createElement('div');lb.className='lightbox';
   lb.innerHTML=`<img src="${src}">`;lb.onclick=()=>lb.remove();
   document.body.appendChild(lb);
 }
 
-// ── KİLİT ──
-function canCheck(di,mi){
-  return getYemekler(di,mi).some(y=>y.ad.trim())&&!!getState().photos[`${di}-${mi}`];
-}
+// Fotoğraf artık zorunlu değil — sadece yemek adı yeterli
+function canCheck(di,mi){return getYemekler(di,mi).some(y=>y.ad.trim());}
+
 function tryToggleMeal(di,mi){
   const st=getState();const k=`${di}-${mi}`;const was=!!st.meals[k];
   if(was){st.meals[k]=false;save();render();return;}
   if(!canCheck(di,mi)){shakeCheck(di,mi);showHint(di,mi);return;}
-  st.meals[k]=true;save();
-  playMealSound();triggerFX(di,mi);
-  setTimeout(()=>checkDayComplete(di),100);
-  render();
+  st.meals[k]=true;save();playMealSound();triggerFX(di,mi);
+  setTimeout(()=>checkDayComplete(di),100);render();
 }
 function shakeCheck(di,mi){
-  const el=document.getElementById(`chk-${di}-${mi}`);if(!el) return;
+  const el=document.getElementById(`chk-${di}-${mi}`);if(!el)return;
   const seq=[6,-6,6,-6,0];let i=0;
   const run=()=>{if(i>=seq.length){el.style.transform='';return;}el.style.transform=`translateX(${seq[i]}px)`;i++;setTimeout(run,55);};run();
 }
 function showHint(di,mi){
-  const hasYemek=getYemekler(di,mi).some(y=>y.ad.trim());
-  const hasPhoto=!!getState().photos[`${di}-${mi}`];
-  const msg=!hasYemek&&!hasPhoto?'Önce yemek ekle ve fotoğraf çek':!hasYemek?'Önce en az bir yemek ekle':'Önce fotoğraf çek';
   const el=document.getElementById(`hint-${di}-${mi}`);
-  if(el){el.textContent=msg;el.style.opacity='1';setTimeout(()=>el.style.opacity='0',2500);}
+  if(el){el.textContent='Önce en az bir yemek ekle';el.style.opacity='1';setTimeout(()=>el.style.opacity='0',2500);}
 }
 function checkDayComplete(di){
-  if(MEALS.every((_,mi)=>!!getState().meals[`${di}-${mi}`])){
-    setTimeout(()=>{bigBurst(di);playDayCompleteSound();},80);
-  }
+  if(MEALS.every((_,mi)=>!!getState().meals[`${di}-${mi}`])){setTimeout(()=>{bigBurst(di);playDayCompleteSound();},80);}
 }
 
-// ── RENDER ──
 function render(){
   const minOff=getMinWeekOffset();
   document.getElementById('prev-btn').disabled=(weekOffset<=minOff);
@@ -512,17 +466,14 @@ function render(){
   document.getElementById('week-label').textContent=fmt(mon)+' – '+fmt(end);
   const st=getState();
   let total=0,done=0;
-  dates.forEach((date,di)=>{
-    if(date<START_DATE) return;
-    MEALS.forEach((_,mi)=>{total++;if(st.meals[`${di}-${mi}`])done++;});
-  });
+  dates.forEach((date,di)=>{if(date<START_DATE)return;MEALS.forEach((_,mi)=>{total++;if(st.meals[`${di}-${mi}`])done++;});});
   document.getElementById('prog-text').textContent=`${done} / ${total}`;
   document.getElementById('prog-fill').style.width=total>0?(done/total*100)+'%':'0%';
-  document.getElementById('streak-badge').textContent=`🔥 ${calcStreak()} gün seri`;
+  document.getElementById('streak-badge').textContent=`🔥 ${calcStreak()} gün`;
 
   const grid=document.getElementById('days-grid');grid.innerHTML='';
   dates.forEach((date,di)=>{
-    if(date<START_DATE) return;
+    if(date<START_DATE)return;
     const dayDone=MEALS.every((_,mi)=>!!st.meals[`${di}-${mi}`]);
     const dayDoneCount=MEALS.filter((_,mi)=>!!st.meals[`${di}-${mi}`]).length;
     const card=document.createElement('div');
@@ -535,51 +486,53 @@ function render(){
       const photo=st.photos[`${di}-${mi}`];
       const lockClass=checked?'checked':canCheck(di,mi)?'ready':'locked';
       const liste=getYemekler(di,mi);
-      const toplamKcal=liste.reduce((s,y)=>s+(y.kcal||0),0);
-      const toplamP=Math.round(liste.reduce((s,y)=>s+(y.p||0),0)*10)/10;
-      const toplamK=Math.round(liste.reduce((s,y)=>s+(y.k||0),0)*10)/10;
-      const toplamY=Math.round(liste.reduce((s,y)=>s+(y.y||0),0)*10)/10;
+      const tKcal=liste.reduce((s,y)=>s+(y.kcal||0),0);
+      const tP=Math.round(liste.reduce((s,y)=>s+(y.p||0),0)*10)/10;
+      const tK=Math.round(liste.reduce((s,y)=>s+(y.k||0),0)*10)/10;
+      const tY=Math.round(liste.reduce((s,y)=>s+(y.y||0),0)*10)/10;
 
       const yemeklerHTML=liste.map((y,idx)=>`
         <div class="yemek-satir">
-          <input class="yemek-input${checked?' done-input':''}" placeholder="örn: 3 yumurta, 150 tavuk göğüs" value="${(y.ad||'').replace(/"/g,'&quot;')}"
+          <input class="yemek-input${checked?' done-input':''}" placeholder="örn: 3 yumurta, 150 tavuk göğüs"
+            value="${(y.ad||'').replace(/"/g,'&quot;')}"
             oninput="yemekAdDegis(${di},${mi},${idx},this.value)"
             onblur="yemekBlur(${di},${mi},${idx},this.value)">
           <span id="kcal-badge-${di}-${mi}-${idx}" class="${y.kcal?'kcal-badge':''}">${y.kcal?'~'+y.kcal+' kcal':''}</span>
           <button class="sil-btn" onclick="yemekSil(${di},${mi},${idx})">✕</button>
         </div>
         <div class="besin-detay" id="det-${di}-${mi}-${idx}">
-          ${y.p!=null?`<span class="bd-p">P: ${y.p}g</span><span class="bd-k">K: ${y.k}g</span><span class="bd-y">Y: ${y.y}g</span>`:''}
+          ${y.p!=null?`<span class="bd-p">P:${y.p}g</span><span class="bd-k">K:${y.k}g</span><span class="bd-y">Y:${y.y}g</span>`:''}
         </div>`).join('');
 
       const photoHTML=photo
         ?`<div class="photo-thumb-wrap"><img class="photo-thumb" src="${photo}" onclick="openLightbox('${photo}')"><button class="photo-del" onclick="removePhoto(${di},${mi})">✕</button></div>`
-        :`<div class="photo-cam-btn" onclick="fotoMenuAc(${di},${mi})"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="14" height="10" rx="2"/><circle cx="8" cy="9" r="2.8"/><path d="M5.5 4l1-2h3l1 2"/></svg>Fotoğraf ekle</div>`;
+        :`<div class="photo-cam-btn" onclick="fotoMenuAc(${di},${mi})">📷 Fotoğraf ekle (isteğe bağlı)</div>`;
 
       return `<div class="meal-block">
         <div class="meal-block-header">
           <div class="meal-check ${lockClass}" id="chk-${di}-${mi}" onclick="tryToggleMeal(${di},${mi})"></div>
+          <span class="meal-emoji">${MEAL_EMOJIS[mi]}</span>
           <span class="meal-label">${m}</span>
         </div>
         <div class="yemek-listesi" id="ylist-${di}-${mi}">${yemeklerHTML}</div>
         ${!checked?`<button class="ekle-btn" onclick="yemekEkle(${di},${mi})">+ Yemek ekle</button>`:''}
-        <div class="meal-toplam-wrap${toplamKcal>0?' visible':''}" id="meal-toplam-${di}-${mi}">
-          ${toplamKcal>0?`<div class="meal-toplam-kcal">Toplam: ${toplamKcal} kcal</div>
-          <div class="meal-toplam-makro"><span class="bd-p">P: ${toplamP}g</span><span class="bd-k">K: ${toplamK}g</span><span class="bd-y">Y: ${toplamY}g</span></div>`:''}
+        <div class="meal-toplam-wrap${tKcal>0?' visible':''}" id="meal-toplam-${di}-${mi}">
+          ${tKcal>0?`<div class="meal-toplam-kcal">⚡ ${tKcal} kcal</div>
+          <div class="meal-toplam-makro"><span class="bd-p">💪 ${tP}g</span><span class="bd-k">⚡ ${tK}g</span><span class="bd-y">🥑 ${tY}g</span></div>`:''}
         </div>
         <div class="photo-area">${photoHTML}</div>
-        <div style="min-height:16px"><span class="hint" id="hint-${di}-${mi}" style="opacity:0"></span></div>
+        <span class="hint" id="hint-${di}-${mi}" style="opacity:0"></span>
       </div>`;
     }).join('');
 
     card.innerHTML=`
       <div class="day-header">
-        <div style="display:flex;align-items:center;gap:8px">
+        <div class="day-left">
           <span class="day-name">${DAYS[di]}</span>
           ${isToday(date)?'<span class="today-badge">bugün</span>':''}
-          <span style="font-size:12px;color:#aaa">${fmt(date)}</span>
+          <span class="day-date">${fmt(date)}</span>
         </div>
-        <div style="display:flex;align-items:center;gap:8px">
+        <div class="day-right">
           <div class="day-mini">${dotsHTML}</div>
           <span class="day-pct">${pct}%</span>
         </div>
@@ -593,108 +546,46 @@ function render(){
 function calcStreak(){
   let streak=0;const today=new Date();today.setHours(0,0,0,0);let check=new Date(today);
   while(true){
-    if(check<START_DATE) break;
-    const mon=getMonday(check,0);const wk=mon.toISOString().slice(0,10);
+    if(check<START_DATE)break;
+    const wk=getMonday(check,0).toISOString().slice(0,10);
     const st=data[wk]||{meals:{}};const di=(check.getDay()+6)%7;
-    if(MEALS.every((_,mi)=>!!st.meals[`${di}-${mi}`])) streak++;
-    else if(check<today) break;
-    check.setDate(check.getDate()-1);if(streak>365) break;
+    if(MEALS.every((_,mi)=>!!st.meals[`${di}-${mi}`]))streak++;
+    else if(check<today)break;
+    check.setDate(check.getDate()-1);if(streak>365)break;
   }
   return streak;
 }
 
-// ── SES ──
 function playMealSound(){
-  try{
-    const ac=new AudioContext();const t=ac.currentTime;
-    [[880,0.22,0.55,0],[1760,0.07,0.3,0],[2637,0.04,0.18,0.01]].forEach(([f,v,d,delay])=>{
-      const o=ac.createOscillator(),g=ac.createGain();
-      o.type='sine';o.frequency.value=f;o.connect(g);g.connect(ac.destination);
-      const s=t+delay;g.gain.setValueAtTime(0,s);g.gain.linearRampToValueAtTime(v,s+0.01);
-      g.gain.exponentialRampToValueAtTime(0.0001,s+d);o.start(s);o.stop(s+d+0.05);
-    });
-    setTimeout(()=>ac.close(),800);
-  }catch(e){}
+  try{const ac=new AudioContext();const t=ac.currentTime;
+  [[880,0.22,0.55,0],[1760,0.07,0.3,0],[2637,0.04,0.18,0.01]].forEach(([f,v,d,dl])=>{
+    const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=f;o.connect(g);g.connect(ac.destination);
+    const s=t+dl;g.gain.setValueAtTime(0,s);g.gain.linearRampToValueAtTime(v,s+0.01);g.gain.exponentialRampToValueAtTime(0.0001,s+d);o.start(s);o.stop(s+d+0.05);
+  });setTimeout(()=>ac.close(),800);}catch(e){}
 }
 function playDayCompleteSound(){
-  try{
-    const ac=new AudioContext();const t=ac.currentTime;
-    function note(f,s,d,v=0.18,type='sine'){
-      const o=ac.createOscillator(),g=ac.createGain();
-      o.type=type;o.frequency.value=f;o.connect(g);g.connect(ac.destination);
-      g.gain.setValueAtTime(0,t+s);g.gain.linearRampToValueAtTime(v,t+s+0.012);
-      g.gain.exponentialRampToValueAtTime(0.0001,t+s+d);o.start(t+s);o.stop(t+s+d+0.05);
-    }
-    [[523.25,0,0.35,0.16],[659.25,0.22,0.35,0.18],[783.99,0.44,0.40,0.20],[1046.5,0.66,0.90,0.22]].forEach(([f,s,d,v])=>note(f,s,d,v));
-    [[1046.5,0,0.25,0.06],[1318.5,0.22,0.25,0.06],[1568,0.44,0.28,0.06],[2093,0.66,0.60,0.06]].forEach(([f,s,d,v])=>note(f,s,d,v));
-    note(130.81,0,0.5,0.12,'triangle');note(130.81,0.66,1.0,0.14,'triangle');
-    note(2093,0.66,0.4,0.05);note(1046.5,1.0,1.8,0.08);note(523.25,1.0,2.0,0.06);
-    setTimeout(()=>ac.close(),4000);
-  }catch(e){}
+  try{const ac=new AudioContext();const t=ac.currentTime;
+  function note(f,s,d,v=0.18,type='sine'){const o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.value=f;o.connect(g);g.connect(ac.destination);g.gain.setValueAtTime(0,t+s);g.gain.linearRampToValueAtTime(v,t+s+0.012);g.gain.exponentialRampToValueAtTime(0.0001,t+s+d);o.start(t+s);o.stop(t+s+d+0.05);}
+  [[523.25,0,0.35,0.16],[659.25,0.22,0.35,0.18],[783.99,0.44,0.40,0.20],[1046.5,0.66,0.90,0.22]].forEach(([f,s,d,v])=>note(f,s,d,v));
+  [[1046.5,0,0.25,0.06],[1318.5,0.22,0.25,0.06],[1568,0.44,0.28,0.06],[2093,0.66,0.60,0.06]].forEach(([f,s,d,v])=>note(f,s,d,v));
+  note(130.81,0,0.5,0.12,'triangle');note(130.81,0.66,1.0,0.14,'triangle');note(2093,0.66,0.4,0.05);note(1046.5,1.0,1.8,0.08);note(523.25,1.0,2.0,0.06);
+  setTimeout(()=>ac.close(),4000);}catch(e){}
 }
 
-// ── FX ──
 const fxCanvas=document.createElement('canvas');
 fxCanvas.style.cssText='position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9999';
 document.body.appendChild(fxCanvas);
 const fxCtx=fxCanvas.getContext('2d');
-let particles=[];let animating=false;
+let particles=[],animating=false;
 function resizeFx(){fxCanvas.width=window.innerWidth;fxCanvas.height=window.innerHeight;}
 window.addEventListener('resize',resizeFx);resizeFx();
-function triggerFX(di,mi){
-  const el=document.getElementById(`chk-${di}-${mi}`);if(!el) return;
-  const r=el.getBoundingClientRect();
-  spawnFX(r.left+r.width/2,r.top+r.height/2,'confetti',22);
-  if(!animating) animate();
-}
-function bigBurst(di){
-  const cards=document.querySelectorAll('.day-card');
-  const dates=getWeekDates(weekOffset);
-  const visible=dates.map((d,i)=>({date:d,di:i})).filter(x=>x.date>=START_DATE);
-  const ci=visible.findIndex(x=>x.di===di);
-  if(ci<0||ci>=cards.length) return;
-  const r=cards[ci].getBoundingClientRect();
-  spawnFX(r.left+r.width/2,r.top+r.height/2,'confetti',80);
-  spawnFX(r.left+r.width/2,r.top+r.height/2,'stars',40);
-  if(!animating) animate();
-}
-function spawnFX(cx,cy,type,count){
-  const colors=['#1D9E75','#EF9F27','#378ADD','#D4537E','#E24B4A','#7F77DD','#5DCAA5'];
-  for(let i=0;i<count;i++){
-    const angle=Math.random()*Math.PI*2,speed=2+Math.random()*6;
-    particles.push({x:cx,y:cy,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,
-      life:1,decay:0.013+Math.random()*0.018,size:type==='stars'?4:4+Math.random()*5,
-      color:colors[Math.floor(Math.random()*colors.length)],type,
-      rot:Math.random()*Math.PI*2,rotV:(Math.random()-0.5)*0.25,
-      shape:['rect','circle','tri'][Math.floor(Math.random()*3)]});
-  }
-}
-function animate(){
-  animating=true;fxCtx.clearRect(0,0,fxCanvas.width,fxCanvas.height);
-  particles=particles.filter(p=>{
-    p.x+=p.vx;p.y+=p.vy;p.vy+=0.18;p.vx*=0.98;p.life-=p.decay;p.rot+=p.rotV;
-    if(p.life<=0) return false;
-    fxCtx.save();fxCtx.globalAlpha=p.life;fxCtx.translate(p.x,p.y);fxCtx.rotate(p.rot);fxCtx.fillStyle=p.color;
-    if(p.type==='stars'){drawStar(fxCtx,0,0,p.size);}
-    else if(p.shape==='circle'){fxCtx.beginPath();fxCtx.arc(0,0,p.size/2,0,Math.PI*2);fxCtx.fill();}
-    else if(p.shape==='tri'){fxCtx.beginPath();fxCtx.moveTo(0,-p.size/2);fxCtx.lineTo(p.size/2,p.size/2);fxCtx.lineTo(-p.size/2,p.size/2);fxCtx.closePath();fxCtx.fill();}
-    else{fxCtx.fillRect(-p.size/2,-p.size/4,p.size,p.size/2);}
-    fxCtx.restore();return true;
-  });
-  if(particles.length>0) requestAnimationFrame(animate);else animating=false;
-}
-function drawStar(c,x,y,r){
-  c.beginPath();
-  for(let i=0;i<5;i++){
-    const a=Math.PI/2+i*Math.PI*2/5,b=a+Math.PI/5;
-    if(i===0) c.moveTo(x+Math.cos(a)*r,y-Math.sin(a)*r);
-    else c.lineTo(x+Math.cos(a)*r,y-Math.sin(a)*r);
-    c.lineTo(x+Math.cos(b)*r*0.4,y-Math.sin(b)*r*0.4);
-  }
-  c.closePath();c.fill();
-}
+function triggerFX(di,mi){const el=document.getElementById(`chk-${di}-${mi}`);if(!el)return;const r=el.getBoundingClientRect();spawnFX(r.left+r.width/2,r.top+r.height/2,'confetti',22);if(!animating)animate();}
+function bigBurst(di){const cards=document.querySelectorAll('.day-card');const dates=getWeekDates(weekOffset);const vis=dates.map((d,i)=>({date:d,di:i})).filter(x=>x.date>=START_DATE);const ci=vis.findIndex(x=>x.di===di);if(ci<0||ci>=cards.length)return;const r=cards[ci].getBoundingClientRect();spawnFX(r.left+r.width/2,r.top+r.height/2,'confetti',80);spawnFX(r.left+r.width/2,r.top+r.height/2,'stars',40);if(!animating)animate();}
+function spawnFX(cx,cy,type,count){const colors=['#1D9E75','#EF9F27','#378ADD','#D4537E','#E24B4A','#7F77DD','#5DCAA5'];for(let i=0;i<count;i++){const angle=Math.random()*Math.PI*2,speed=2+Math.random()*6;particles.push({x:cx,y:cy,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,life:1,decay:0.013+Math.random()*0.018,size:type==='stars'?4:4+Math.random()*5,color:colors[Math.floor(Math.random()*colors.length)],type,rot:Math.random()*Math.PI*2,rotV:(Math.random()-0.5)*0.25,shape:['rect','circle','tri'][Math.floor(Math.random()*3)]});}}
+function animate(){animating=true;fxCtx.clearRect(0,0,fxCanvas.width,fxCanvas.height);particles=particles.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.18;p.vx*=0.98;p.life-=p.decay;p.rot+=p.rotV;if(p.life<=0)return false;fxCtx.save();fxCtx.globalAlpha=p.life;fxCtx.translate(p.x,p.y);fxCtx.rotate(p.rot);fxCtx.fillStyle=p.color;if(p.type==='stars'){drawStar(fxCtx,0,0,p.size);}else if(p.shape==='circle'){fxCtx.beginPath();fxCtx.arc(0,0,p.size/2,0,Math.PI*2);fxCtx.fill();}else if(p.shape==='tri'){fxCtx.beginPath();fxCtx.moveTo(0,-p.size/2);fxCtx.lineTo(p.size/2,p.size/2);fxCtx.lineTo(-p.size/2,p.size/2);fxCtx.closePath();fxCtx.fill();}else{fxCtx.fillRect(-p.size/2,-p.size/4,p.size,p.size/2);}fxCtx.restore();return true;});if(particles.length>0)requestAnimationFrame(animate);else animating=false;}
+function drawStar(c,x,y,r){c.beginPath();for(let i=0;i<5;i++){const a=Math.PI/2+i*Math.PI*2/5,b=a+Math.PI/5;if(i===0)c.moveTo(x+Math.cos(a)*r,y-Math.sin(a)*r);else c.lineTo(x+Math.cos(a)*r,y-Math.sin(a)*r);c.lineTo(x+Math.cos(b)*r*0.4,y-Math.sin(b)*r*0.4);}c.closePath();c.fill();}
 
-if('serviceWorker' in navigator){navigator.serviceWorker.register('/service-worker.js');}
+if('serviceWorker' in navigator)navigator.serviceWorker.register('/service-worker.js');
 render();
 </script>
 </body>
