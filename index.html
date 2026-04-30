@@ -402,7 +402,7 @@ async function obGoogleGiris(){
   status.textContent='Giriş yapılıyor...';
   try{
     const provider=new _GoogleProvider();
-    await _signInWithPopup(auth,provider);
+    await _signInWithRedirect(auth,provider);
     // onAuthStateChanged devralacak
   }catch(e){
     status.textContent='Giriş başarısız, tekrar dene.';
