@@ -514,8 +514,9 @@ function getSiluetOran(){
   if(!profil)return 0.5;
   const bugun=new Date().toISOString().slice(0,10);
   const mevcutKilo=gunKilolar[bugun]||profil.kilo;
-  const bas=profil.kilo,hdf=profil.hKilo;
-  if(bas===hdf)return 0.7;
+  const bas=parseFloat(profil.kilo);
+  const hdf=parseFloat(profil.hKilo||profil.hedefKilo||profil.hkilo||bas);
+  if(bas===hdf)return 0.5;
   return Math.max(0,Math.min(1,(bas-mevcutKilo)/(bas-hdf)));
 }
 function getMealOran(){
@@ -539,7 +540,8 @@ function renderSiluet(){
   const color=getOranColor(total);
   const bugun=new Date().toISOString().slice(0,10);
   const mevcutKilo=gunKilolar[bugun]||profil.kilo;
-  const kalan=Math.max(0,(mevcutKilo-profil.hKilo)).toFixed(1);
+  const hKilo=profil.hKilo||profil.hedefKilo||profil.hkilo||profil.kilo;
+  const kalan=Math.max(0,(mevcutKilo-hKilo)).toFixed(1);
   const yuzde=Math.round(Math.max(0,Math.min(100,kOran*100)));
   const durum=total<0.3?'Obez':total<0.6?'Kilolu':total<0.85?'Normal':'Fit';
   const durumColor=total<0.3?'#E24B4A':total<0.6?'#EF9F27':total<0.85?'#378ADD':'#1D9E75';
@@ -551,7 +553,7 @@ function renderSiluet(){
     </div>
     <div class="siluet-right">
       <div class="siluet-name">${profil.isim}</div>
-      <div class="siluet-sub">Hedef: ${profil.hKilo} kg • Kalan: ${kalan} kg</div>
+      <div class="siluet-sub">Hedef: ${hKilo} kg • Kalan: ${kalan} kg</div>
       <div class="siluet-stats">
         <div class="sstat"><span class="sstat-lbl">Mevcut kilo</span><div class="sstat-right"><span class="sstat-val">${mevcutKilo} kg</span></div></div>
         <div class="sstat"><span class="sstat-lbl">Bugün öğünler</span><div class="sstat-right"><div class="sstat-bar"><div class="sstat-fill" style="width:${mOran*100}%;background:var(--green)"></div></div><span class="sstat-val">${Math.round(mOran*3)}/3</span></div></div>
