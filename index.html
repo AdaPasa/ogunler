@@ -888,11 +888,9 @@ function updateAuthUI(){
   if(currentUser){
     if(nameEl) nameEl.textContent = currentUser.displayName || currentUser.email || '';
     btn.textContent = 'Çıkış Yap';
-    btn.onclick = () => auth.signOut().catch(console.error);
   } else {
     if(nameEl) nameEl.textContent = '';
     btn.textContent = 'Google ile Giriş';
-    btn.onclick = googleGiris;
   }
 }
 
