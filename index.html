@@ -217,8 +217,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .su-row{display:flex;align-items:center;gap:10px}
 .su-lbl{font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px}
 .su-bardaklar{display:flex;gap:5px;flex-wrap:wrap;flex:1}
-.su-bardak{width:30px;height:30px;border-radius:8px;border:1.5px solid var(--border);background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;transition:all 0.15s}
-.su-bardak.dolu{background:rgba(55,138,221,0.2);border-color:var(--blue)}
+.su-bardak{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--border);background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all 0.15s;filter:grayscale(1);opacity:0.4}
+.su-bardak.dolu{background:rgba(55,138,221,0.2);border-color:var(--blue);filter:grayscale(0);opacity:1}
 .takviye-baslik{font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px}
 .takviye-liste{display:flex;flex-direction:column;gap:5px}
 .takviye-row{display:flex;align-items:center;gap:8px}
@@ -877,6 +877,14 @@ function renderProfil(){
       <div class="profil-row"><span class="profil-row-lbl">Yağ hedefi</span><span class="profil-row-val" style="color:var(--pink)">${makroH.y}g</span></div>
     </div>
     <div class="profil-kart">
+      <h3>Günlük Su Hedefi</h3>
+      <div class="profil-row"><span class="profil-row-lbl">Hedef</span><span class="profil-row-val" style="color:var(--blue)">${parseInt(localStorage.getItem('suHedefi')||2000)} ml</span></div>
+      <div class="kilo-input-row">
+        <input class="kilo-inp" id="su-hedef-inp" type="number" placeholder="${parseInt(localStorage.getItem('suHedefi')||2000)}" min="500" max="6000" step="100">
+        <button class="kilo-save" onclick="suHedefiKaydet()">Kaydet</button>
+      </div>
+    </div>
+    <div class="profil-kart">
       <h3>Günlük Kilo Girişi</h3>
       <div class="profil-row"><span class="profil-row-lbl">Bugünkü kilo</span><span class="profil-row-val">${mk} kg</span></div>
       <div class="kilo-input-row">
@@ -889,6 +897,17 @@ function renderProfil(){
       ${currentUser?`<div class="profil-row"><span class="profil-row-lbl">Giriş yapılan hesap</span><span class="profil-row-val" style="font-size:12px">${currentUser.email||currentUser.displayName}</span></div>`:''}
       <button class="sifirla-btn" onclick="hesabiSifirla()">🔄 Profili Sıfırla</button>
     </div>`;
+}
+
+let suHedefi=parseInt(localStorage.getItem('suHedefi')||'2000');
+
+function suHedefiKaydet(){
+  const v=parseInt(document.getElementById('su-hedef-inp').value);
+  if(!v||v<500||v>6000){alert('500-6000 ml arası gir');return;}
+  suHedefi=v;localStorage.setItem('suHedefi',v);
+  if(currentUser)fbWrite('profil',{profil,gunlukHedef,makroH,gunKilolar,suHedefi});
+  renderProfil();
+  render();
 }
 
 function profilKiloKaydet(){
@@ -985,7 +1004,7 @@ function renderSuTakviye(di){
   const toplamMl=d.suMl||0;
   const bardakDolu=Math.min(8,Math.round(toplamMl/250));
   const yuzde=Math.min(100,Math.round(toplamMl/2000*100));
-  const bardaklar=Array.from({length:8},(_,i)=>`<div class="su-bardak${i<bardakDolu?' dolu':''}" onclick="suToggle(${di},${i})">💧</div>`).join('');
+  const bardaklar=Array.from({length:8},(_,i)=>`<div class="su-bardak${i<bardakDolu?' dolu':''}" onclick="suToggle(${di},${i})">🥛</div>`).join('');
 
   const takvGrid=TAKVIYELER.map((t,ti)=>{
     const adet=d.takviyeler[ti]||0;
@@ -1011,10 +1030,10 @@ function renderSuTakviye(di){
       <div style="background:rgba(55,138,221,0.07);border:1px solid rgba(55,138,221,0.2);border-radius:13px;padding:11px 13px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <span style="font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px">💧 Su</span>
-          <span style="font-size:12px;font-weight:800;color:var(--blue)">${toplamMl} ml <span style="color:var(--sub);font-weight:500">/ 2000 ml</span></span>
+          <span style="font-size:12px;font-weight:800;color:var(--blue)">${toplamMl} ml <span style="color:var(--sub);font-weight:500">/ ${suHedefi} ml</span></span>
         </div>
         <div style="background:var(--border);border-radius:99px;height:5px;margin-bottom:10px;overflow:hidden">
-          <div style="height:100%;width:${yuzde}%;background:var(--blue);border-radius:99px;transition:width 0.4s"></div>
+          <div style="height:100%;width:${Math.min(100,Math.round(toplamMl/suHedefi*100))}%;background:var(--blue);border-radius:99px;transition:width 0.4s"></div>
         </div>
         <div class="su-bardaklar" style="margin-bottom:8px">${bardaklar}</div>
         <div style="display:flex;align-items:center;gap:8px">
@@ -1191,23 +1210,32 @@ async function syncFromFirebase(){
     const pSnap = await ref('profil').get();
     if(pSnap.exists){
       const pd = pSnap.data();
-      if(pd.profil){ profil=pd.profil; saveP(); }
+      if(pd.profil){ profil=pd.profil; localStorage.setItem('profil',JSON.stringify(profil)); }
       if(pd.gunlukHedef){ gunlukHedef=pd.gunlukHedef; localStorage.setItem('kaloriH',gunlukHedef); }
       if(pd.makroH){ makroH=pd.makroH; localStorage.setItem('makroH',JSON.stringify(makroH)); }
       if(pd.gunKilolar){ gunKilolar=pd.gunKilolar; localStorage.setItem('gunKilolar',JSON.stringify(gunKilolar)); }
+      if(pd.suHedefi){ suHedefi=pd.suHedefi; localStorage.setItem('suHedefi',suHedefi); }
     }
 
     const dSnap = await ref('ogunler').get();
-    if(dSnap.exists && dSnap.data().data){ data=dSnap.data().data; save(); }
+    if(dSnap.exists && dSnap.data().data){
+      data=dSnap.data().data;
+      localStorage.setItem('ogunler',JSON.stringify(data)); // sadece local, Firebase'e geri yazma
+    }
 
-    // Gerçek zamanlı dinle
+    // Gerçek zamanlı dinle — sadece local güncelle, Firebase'e yazma
     ref('ogunler').onSnapshot(snap=>{
-      if(snap.exists && snap.data().data){ data=snap.data().data; save(); if(profil){ render(); renderIstat(); } }
+      if(snap.exists && snap.data().data){
+        data=snap.data().data;
+        localStorage.setItem('ogunler',JSON.stringify(data));
+        if(profil){ render(); renderIstat(); }
+      }
     });
     ref('profil').onSnapshot(snap=>{
       if(snap.exists){
         const pd = snap.data();
         if(pd.gunKilolar){ gunKilolar=pd.gunKilolar; localStorage.setItem('gunKilolar',JSON.stringify(gunKilolar)); renderIstat(); renderProfil(); }
+        if(pd.suHedefi){ suHedefi=pd.suHedefi; localStorage.setItem('suHedefi',suHedefi); }
       }
     });
 
