@@ -416,13 +416,13 @@ function obGirisAtla(){
   document.getElementById('obs-1').classList.add('active');
   obProg(1);
 }
-  if(step===1){const isim=document.getElementById('ob-isim').value.trim();if(!isim||!obD.cins){alert('Tüm alanları doldur');return;}obD.isim=isim;}
+  function obNext(step){if(step===1){const isim=document.getElementById('ob-isim').value.trim();if(!isim||!obD.cins){alert('Tüm alanları doldur');return;}obD.isim=isim;}
   if(step===2){const y=+document.getElementById('ob-yas').value,b=+document.getElementById('ob-boy').value,k=+document.getElementById('ob-kilo').value;if(!y||!b||!k){alert('Tüm alanları doldur');return;}obD.yas=y;obD.boy=b;obD.kilo=k;}
   if(step===3){if(!obD.hedef||!obD.akt){alert('Seçim yap');return;}obHesapla();}
   document.getElementById(`obs-${step}`).classList.remove('active');
   document.getElementById(`obs-${step+1}`).classList.add('active');
   obProg(step);
-}
+}}
 
 function obHesapla(){
   if(!obD.yas||!obD.boy||!obD.kilo)return;
