@@ -211,6 +211,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .yemek-ekle-btn{width:100%;padding:14px;border:none;border-radius:12px;background:var(--green);color:#fff;font-size:15px;font-weight:700;cursor:pointer}
 .yemek-ekle-btn:disabled{opacity:0.4;cursor:default}
 .yemek-iptal{width:100%;padding:12px;border:1px solid var(--border);border-radius:12px;background:transparent;color:var(--sub);font-size:14px;cursor:pointer;margin-top:6px}
+
+/* Su & Takviye */
+.su-takviye-blok{border-top:1px solid var(--border);margin-top:4px;padding-top:12px;display:flex;flex-direction:column;gap:10px}
+.su-row{display:flex;align-items:center;gap:10px}
+.su-lbl{font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px}
+.su-bardaklar{display:flex;gap:5px;flex-wrap:wrap;flex:1}
+.su-bardak{width:30px;height:30px;border-radius:8px;border:1.5px solid var(--border);background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;transition:all 0.15s}
+.su-bardak.dolu{background:rgba(55,138,221,0.2);border-color:var(--blue)}
+.takviye-baslik{font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px}
+.takviye-liste{display:flex;flex-direction:column;gap:5px}
+.takviye-row{display:flex;align-items:center;gap:8px}
+.takviye-isim{flex:1;font-size:13px}
+.takviye-adet{display:flex;align-items:center;gap:6px}
+.takviye-btn{width:24px;height:24px;border-radius:7px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.takviye-sayi{font-size:13px;font-weight:700;min-width:16px;text-align:center}
+.takviye-ekle-btn{display:flex;align-items:center;gap:4px;padding:5px 10px;font-size:12px;color:var(--blue);background:rgba(55,138,221,0.1);border:1px dashed rgba(55,138,221,0.4);border-radius:9px;cursor:pointer;width:fit-content;font-weight:600;margin-top:2px}
 </style>
 </head>
 <body>
@@ -595,15 +611,15 @@ const BESINLER=[
   {isimler:['yulaf','yulaf ezmesi','oat'],birim:'gram',kcal:3.89,p:0.017,k:0.066,y:0.007},
   {isimler:['makarna'],birim:'gram',kcal:1.31,p:0.05,k:0.25,y:0.011},
   {isimler:['ekmek'],birim:'gram',kcal:2.65,p:0.09,k:0.049,y:0.032},
-  {isimler:['tavuk göğüs','tavuk göğsü','chicken breast'],birim:'gram',kcal:1.65,p:0.031,k:0,y:0.036},
-  {isimler:['tavuk but'],birim:'gram',kcal:2.09,p:0.026,k:0,y:0.109},
-  {isimler:['kıyma'],birim:'gram',kcal:2.54,p:0.017,k:0,y:0.2},
-  {isimler:['somon'],birim:'gram',kcal:2.08,p:0.02,k:0,y:0.13},
-  {isimler:['ton balığı','tuna'],birim:'gram',kcal:1.16,p:0.026,k:0,y:0.001},
-  {isimler:['süt'],birim:'ml',kcal:0.42,p:0.003,k:0.005,y:0.001},
-  {isimler:['yoğurt'],birim:'gram',kcal:0.59,p:0.01,k:0.038,y:0.032},
-  {isimler:['beyaz peynir','feta'],birim:'gram',kcal:2.64,p:0.014,k:0.004,y:0.021},
-  {isimler:['kaşar','kaşar peyniri'],birim:'gram',kcal:3.57,p:0.025,k:0.013,y:0.029},
+  {isimler:['tavuk göğüs','tavuk göğsü','chicken breast'],birim:'gram',kcal:1.65,p:0.31,k:0,y:0.036},
+  {isimler:['tavuk but'],birim:'gram',kcal:2.09,p:0.18,k:0,y:0.109},
+  {isimler:['kıyma'],birim:'gram',kcal:2.54,p:0.17,k:0,y:0.2},
+  {isimler:['somon'],birim:'gram',kcal:2.08,p:0.2,k:0,y:0.13},
+  {isimler:['ton balığı','tuna'],birim:'gram',kcal:1.16,p:0.26,k:0,y:0.001},
+  {isimler:['süt'],birim:'ml',kcal:0.42,p:0.033,k:0.05,y:0.01},
+  {isimler:['yoğurt'],birim:'gram',kcal:0.59,p:0.035,k:0.038,y:0.032},
+  {isimler:['beyaz peynir','feta'],birim:'gram',kcal:2.64,p:0.14,k:0.004,y:0.021},
+  {isimler:['kaşar','kaşar peyniri'],birim:'gram',kcal:3.57,p:0.25,k:0.013,y:0.029},
   {isimler:['zeytinyağı','olive oil'],birim:'gram',kcal:8.84,p:0,k:0,y:1.0},
   {isimler:['tereyağı'],birim:'gram',kcal:7.17,p:0.001,k:0.001,y:0.081},
   {isimler:['hindistancevizi yağı'],birim:'gram',kcal:8.62,p:0,k:0,y:1.0},
@@ -892,6 +908,103 @@ function shake(di,mi){const el=document.getElementById(`chk-${di}-${mi}`);if(!el
 function hint(di,mi){const el=document.getElementById(`hint-${di}-${mi}`);if(el){el.textContent='Önce en az bir yemek ekle';el.style.opacity='1';setTimeout(()=>el.style.opacity='0',2500);}}
 function checkDay(di){if(MEALS.every((_,mi)=>!!getState().meals[`${di}-${mi}`])){setTimeout(()=>{bigBurst(di);playDay();},80);}}
 
+// ── TAKVİYELER ──
+const TAKVIYELER=[
+  {isim:'Vitamin D3',ico:'☀️',birim:'tablet'},
+  {isim:'Vitamin C',ico:'🍊',birim:'tablet'},
+  {isim:'Vitamin B12',ico:'💊',birim:'tablet'},
+  {isim:'Magnezyum',ico:'🪨',birim:'tablet'},
+  {isim:'Çinko',ico:'⚡',birim:'tablet'},
+  {isim:'Omega-3',ico:'🐟',birim:'kapsül'},
+  {isim:'Kreatin',ico:'💪',birim:'gram'},
+  {isim:'Multivitamin',ico:'🌈',birim:'tablet'},
+  {isim:'Demir',ico:'🔴',birim:'tablet'},
+  {isim:'Probiyotik',ico:'🦠',birim:'kapsül'},
+];
+
+function getSuTakviye(di){
+  const st=getState();
+  if(!st.suTakviye)st.suTakviye={};
+  if(!st.suTakviye[di])st.suTakviye[di]={su:0,takviyeler:{}};
+  return st.suTakviye[di];
+}
+
+function suToggle(di,idx){
+  const d=getSuTakviye(di);
+  const yeniBardak=d.su===idx+1?idx:idx+1;
+  d.su=yeniBardak;
+  d.suMl=yeniBardak*250;
+  save();renderSuTakviye(di);
+}
+
+function takviyeArtir(di,tIdx){
+  const d=getSuTakviye(di);
+  d.takviyeler[tIdx]=(d.takviyeler[tIdx]||0)+1;
+  save();renderSuTakviye(di);
+}
+
+function takviyeAzalt(di,tIdx){
+  const d=getSuTakviye(di);
+  if(!d.takviyeler[tIdx])return;
+  d.takviyeler[tIdx]--;
+  if(d.takviyeler[tIdx]<0)d.takviyeler[tIdx]=0;
+  save();renderSuTakviye(di);
+}
+
+function suMlGir(di){
+  const inp=document.getElementById(`su-ml-inp-${di}`);
+  if(!inp)return;
+  const ml=parseFloat(inp.value);
+  if(!ml||ml<1)return;
+  const d=getSuTakviye(di);
+  d.suMl=(d.suMl||0)+ml;
+  d.su=Math.round(d.suMl/250);
+  inp.value='';
+  save();renderSuTakviye(di);
+}
+
+function suMlKeydown(e,di){if(e.key==='Enter')suMlGir(di);}
+
+function renderSuTakviye(di){
+  const el=document.getElementById(`su-takviye-${di}`);if(!el)return;
+  const d=getSuTakviye(di);
+  const toplamMl=d.suMl||d.su*250;
+  const bardakSayisi=Math.max(8,Math.ceil(toplamMl/250));
+  const bardaklar=Array.from({length:8},(_,i)=>`<div class="su-bardak${i<Math.round(toplamMl/250)?' dolu':''}" onclick="suToggle(${di},${i})">💧</div>`).join('');
+  const takvRows=TAKVIYELER.map((t,ti)=>`
+    <div class="takviye-row">
+      <span style="font-size:15px">${t.ico}</span>
+      <span class="takviye-isim">${t.isim}</span>
+      <div class="takviye-adet">
+        <button class="takviye-btn" onclick="takviyeAzalt(${di},${ti})">−</button>
+        <span class="takviye-sayi" style="color:${(d.takviyeler[ti]||0)>0?'var(--green)':'var(--sub)'}">${d.takviyeler[ti]||0}</span>
+        <button class="takviye-btn" onclick="takviyeArtir(${di},${ti})">+</button>
+        <span style="font-size:11px;color:var(--sub)">${t.birim}</span>
+      </div>
+    </div>`).join('');
+  el.innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="su-row">
+        <span class="su-lbl">💧 Su</span>
+        <div class="su-bardaklar">${bardaklar}</div>
+        <span style="font-size:12px;color:var(--blue);font-weight:700;white-space:nowrap">${toplamMl}ml</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-left:2px">
+        <input id="su-ml-inp-${di}" type="number" min="1" placeholder="ml ekle (örn: 1500)" style="flex:1;border:1px solid var(--border);border-radius:9px;padding:7px 10px;font-size:13px;background:var(--card2);color:var(--text);outline:none" onkeydown="suMlKeydown(event,${di})">
+        <button onclick="suMlGir(${di})" style="padding:7px 14px;border:none;border-radius:9px;background:var(--blue);color:#fff;font-size:13px;font-weight:700;cursor:pointer">+Ekle</button>
+        ${toplamMl>0?`<button onclick="suSifirla(${di})" style="padding:7px 10px;border:1px solid var(--border);border-radius:9px;background:transparent;color:var(--sub);font-size:12px;cursor:pointer">Sıfırla</button>`:''}
+      </div>
+    </div>
+    <div>
+      <div class="takviye-baslik">💊 Takviyeler</div>
+      <div class="takviye-liste">${takvRows}</div>
+    </div>`;
+}
+
+function suSifirla(di){
+  const d=getSuTakviye(di);d.su=0;d.suMl=0;save();renderSuTakviye(di);
+}
+
 // ── RENDER ──
 function render(){
   if(!profil)return;
@@ -937,8 +1050,9 @@ function render(){
         <span class="hint" id="hint-${di}-${mi}" style="opacity:0"></span>
       </div>`;
     }).join('');
-    card.innerHTML=`<div class="day-header"><div style="display:flex;align-items:center;gap:8px"><span class="day-name">${DAYS[di]}</span>${isToday(date)?'<span class="today-badge">bugün</span>':''}<span class="day-date">${fmt(date)}</span></div><div style="display:flex;align-items:center;gap:8px"><div class="day-mini">${dots}</div><span class="day-pct">${pct}%</span></div></div><div class="day-meals">${meals}</div>`;
+    card.innerHTML=`<div class="day-header"><div style="display:flex;align-items:center;gap:8px"><span class="day-name">${DAYS[di]}</span>${isToday(date)?'<span class="today-badge">bugün</span>':''}<span class="day-date">${fmt(date)}</span></div><div style="display:flex;align-items:center;gap:8px"><div class="day-mini">${dots}</div><span class="day-pct">${pct}%</span></div></div><div class="day-meals">${meals}<div class="su-takviye-blok" id="su-takviye-${di}"></div></div>`;
     grid.appendChild(card);
+    renderSuTakviye(di);
   });
 }
 
