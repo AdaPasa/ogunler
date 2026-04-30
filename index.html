@@ -7,8 +7,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Öğünler">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" href="/ogunler/icon-192.png">
+<link rel="apple-touch-icon" href="/ogunler/icon-192.png">
+<link rel="manifest" href="/ogunler/manifest.json">
 <title>Öğün Takip</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -1000,7 +1001,7 @@ async function initFirebase(){
 function updateAuthUI(){
   const btn=document.getElementById('auth-btn');
   if(!btn)return;
-  if(currentUser&&!currentUser.isAnonymous){
+  if(currentUser){
     btn.textContent='Çıkış Yap';
     btn.onclick=()=>_signOut(auth);
     const nameEl=document.getElementById('auth-name');
