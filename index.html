@@ -1033,8 +1033,6 @@ function renderSuTakviye(di){
   const el=document.getElementById(`su-takviye-${di}`);if(!el)return;
   const d=getSuTakviye(di);
   const toplamMl=d.suMl||0;
-  const bardakDolu=Math.min(8,Math.round(toplamMl/250));
-  const yuzde=Math.min(100,Math.round(toplamMl/2000*100));
   const toplamBardak=Math.max(4,Math.ceil(suHedefi/250));
   const bardakDolu=Math.min(toplamBardak,d.su||Math.round(toplamMl/250));
   const bardaklar=Array.from({length:toplamBardak},(_,i)=>`<div class="su-bardak${i<bardakDolu?' dolu':''}" onclick="suToggle(${di},${i})">🥛</div>`).join('');
