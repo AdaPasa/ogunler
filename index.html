@@ -209,10 +209,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div class="onboarding" id="onboarding">
   <div class="ob-box">
     <div class="ob-progress" id="ob-prog"></div>
-    <!-- Adım 0 -->
+    <!-- Adım 0: Google Giriş -->
     <div class="ob-step active" id="obs-0">
       <span class="ob-emoji">🥗</span>
-      <div class="ob-title">Hoş geldin!</div>
+      <div class="ob-title">Öğün Takip</div>
+      <div class="ob-sub">Başlamak için Google hesabınla giriş yap. Veriler tüm cihazlarında senkronize olur.</div>
+      <button class="ob-next" id="ob-google-btn" onclick="obGoogleGiris()" style="display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;color:#333;margin-top:2rem">
+        <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Google ile Giriş Yap
+      </button>
+      <div id="ob-giris-status" style="text-align:center;margin-top:1rem;font-size:13px;color:var(--sub)"></div>
+    </div>
+    <!-- Adım 1 -->
+    <div class="ob-step" id="obs-1">
+      <span class="ob-emoji">👋</span>
+      <div class="ob-title">Merhaba!</div>
       <div class="ob-sub">Seni tanıyalım, hedeflerini belirleyelim.</div>
       <div class="ob-field"><label>İsmin</label><input class="ob-input" id="ob-isim" placeholder="Adını yaz..."></div>
       <div class="ob-field"><label>Cinsiyet</label>
@@ -221,20 +232,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
           <div class="ob-btn" onclick="obSel('cins','kadin',this)">👩 Kadın</div>
         </div>
       </div>
-      <button class="ob-next" onclick="obNext(0)">Devam →</button>
+      <button class="ob-next" onclick="obNext(1)">Devam →</button>
     </div>
-    <!-- Adım 1 -->
-    <div class="ob-step" id="obs-1">
+    <!-- Adım 2 -->
+    <div class="ob-step" id="obs-2">
       <span class="ob-emoji">📏</span>
       <div class="ob-title">Fiziksel bilgilerin</div>
       <div class="ob-sub">BMR hesabı için gerekli.</div>
       <div class="ob-field"><label>Yaş</label><input class="ob-input" id="ob-yas" type="number" placeholder="örn: 22" min="10" max="100"></div>
       <div class="ob-field"><label>Boy (cm)</label><input class="ob-input" id="ob-boy" type="number" placeholder="örn: 175"></div>
       <div class="ob-field"><label>Şu anki kilo (kg)</label><input class="ob-input" id="ob-kilo" type="number" placeholder="örn: 90"></div>
-      <button class="ob-next" onclick="obNext(1)">Devam →</button>
+      <button class="ob-next" onclick="obNext(2)">Devam →</button>
     </div>
-    <!-- Adım 2 -->
-    <div class="ob-step" id="obs-2">
+    <!-- Adım 3 -->
+    <div class="ob-step" id="obs-3">
       <span class="ob-emoji">🎯</span>
       <div class="ob-title">Hedefin ne?</div>
       <div class="ob-sub">Buna göre kalori hedefini belirleyeceğiz.</div>
@@ -252,10 +263,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
           <div class="ob-btn" onclick="obSel('akt','aktif',this)">🏋️ Aktif (her gün spor)</div>
         </div>
       </div>
-      <button class="ob-next" onclick="obNext(2)">Devam →</button>
+      <button class="ob-next" onclick="obNext(3)">Devam →</button>
     </div>
-    <!-- Adım 3 -->
-    <div class="ob-step" id="obs-3">
+    <!-- Adım 4 -->
+    <div class="ob-step" id="obs-4">
       <span class="ob-emoji">🏆</span>
       <div class="ob-title">Hedef kilonu gir</div>
       <div class="ob-sub" id="ob-bmr-txt">Hesaplanıyor...</div>
@@ -379,16 +390,31 @@ function saveP(){localStorage.setItem('profil',JSON.stringify(profil));}
 // ── ONBOARDING ──
 let obD={cins:null,hedef:null,akt:null};
 function obSel(k,v,el){obD[k]=v;el.closest('.ob-select-row').querySelectorAll('.ob-btn').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');}
-function obProg(cur){document.getElementById('ob-prog').innerHTML=Array.from({length:4},(_,i)=>`<div class="ob-dot${i<=cur?' active':''}"></div>`).join('');}
+function obProg(cur){document.getElementById('ob-prog').innerHTML=Array.from({length:5},(_,i)=>`<div class="ob-dot${i<=cur?' active':''}"></div>`).join('');}
 obProg(0);
 
+async function obGoogleGiris(){
+  const btn=document.getElementById('ob-google-btn');
+  const status=document.getElementById('ob-giris-status');
+  btn.disabled=true;
+  status.textContent='Giriş yapılıyor...';
+  try{
+    const provider=new _GoogleProvider();
+    await _signInWithPopup(auth,provider);
+    // onAuthStateChanged devralacak
+  }catch(e){
+    status.textContent='Giriş başarısız, tekrar dene.';
+    btn.disabled=false;
+  }
+}
+
 function obNext(step){
-  if(step===0){const isim=document.getElementById('ob-isim').value.trim();if(!isim||!obD.cins){alert('Tüm alanları doldur');return;}obD.isim=isim;}
-  if(step===1){const y=+document.getElementById('ob-yas').value,b=+document.getElementById('ob-boy').value,k=+document.getElementById('ob-kilo').value;if(!y||!b||!k){alert('Tüm alanları doldur');return;}obD.yas=y;obD.boy=b;obD.kilo=k;}
-  if(step===2){if(!obD.hedef||!obD.akt){alert('Seçim yap');return;}obHesapla();}
+  if(step===1){const isim=document.getElementById('ob-isim').value.trim();if(!isim||!obD.cins){alert('Tüm alanları doldur');return;}obD.isim=isim;}
+  if(step===2){const y=+document.getElementById('ob-yas').value,b=+document.getElementById('ob-boy').value,k=+document.getElementById('ob-kilo').value;if(!y||!b||!k){alert('Tüm alanları doldur');return;}obD.yas=y;obD.boy=b;obD.kilo=k;}
+  if(step===3){if(!obD.hedef||!obD.akt){alert('Seçim yap');return;}obHesapla();}
   document.getElementById(`obs-${step}`).classList.remove('active');
   document.getElementById(`obs-${step+1}`).classList.add('active');
-  obProg(step+1);
+  obProg(step);
 }
 
 function obHesapla(){
@@ -947,7 +973,16 @@ async function initFirebase(){
     });
   }catch(e){
     console.log('Firebase yüklenemedi',e);
-    if(profil)showApp();else showOnboarding();
+    if(profil)showApp();
+  else{
+    // Google girişi tamam ama profil yok — adım 1'e geç
+    document.getElementById('obs-0').classList.remove('active');
+    document.getElementById('obs-1').classList.add('active');
+    obProg(1);
+    // İsim alanına Google adını doldur
+    const nameInp=document.getElementById('ob-isim');
+    if(nameInp&&currentUser.displayName)nameInp.value=currentUser.displayName.split(' ')[0];
+  }
   }
 }
 
