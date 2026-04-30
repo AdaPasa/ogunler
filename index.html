@@ -354,14 +354,15 @@ function mealToplamGuncelle(di,mi){
 
 function kaloriGuncelle(){
   const today=new Date();today.setHours(0,0,0,0);
-  const dates=getWeekDates(weekOffset);
+  // Bugünün hangi haftada ve hangi günde olduğunu bul
+  const todayWk=getMonday(today,0).toISOString().slice(0,10);
+  const todayDi=(today.getDay()+6)%7; // 0=Pazartesi
+  const st=data[todayWk]||{yemekler:{}};
+  if(!st.yemekler) st.yemekler={};
   let kcal=0,p=0,k=0,yg=0;
-  dates.forEach((date,di)=>{
-    const d2=new Date(date);d2.setHours(0,0,0,0);
-    if(d2.getTime()!==today.getTime())return;
-    MEALS.forEach((_,mi)=>getYemekler(di,mi).forEach(y=>{
-      if(y.kcal)kcal+=y.kcal;if(y.p)p+=y.p;if(y.k)k+=y.k;if(y.y)yg+=y.y;
-    }));
+  MEALS.forEach((_,mi)=>{
+    const liste=st.yemekler[`${todayDi}-${mi}`]||[];
+    liste.forEach(y=>{if(y.kcal)kcal+=y.kcal;if(y.p)p+=y.p;if(y.k)k+=y.k;if(y.y)yg+=y.y;});
   });
   document.getElementById('kalori-toplam').textContent=kcal;
   document.getElementById('hedef-goster').textContent=gunlukHedef;
