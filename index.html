@@ -634,7 +634,7 @@ function changeWeek(d){const mn=getMinOff();const nx=weekOffset+d;if(nx<mn)retur
 function getY(di,mi){const st=getState();if(!st.yemekler)st.yemekler={};if(!st.yemekler[`${di}-${mi}`])st.yemekler[`${di}-${mi}`]=[{ad:'',kcal:null,p:null,k:null,y:null}];return st.yemekler[`${di}-${mi}`];}
 function yEkle(di,mi){getY(di,mi).push({ad:'',kcal:null,p:null,k:null,y:null});save();render();setTimeout(()=>{const inp=document.querySelectorAll(`#yl-${di}-${mi} .yin`);if(inp.length)inp[inp.length-1].focus();},50);}
 function ySil(di,mi,idx){const l=getY(di,mi);l.splice(idx,1);if(l.length===0)l.push({ad:'',kcal:null,p:null,k:null,y:null});getState().meals[`${di}-${mi}`]=false;save();render();}
-function yDegis(di,mi,idx,val){getY(di,mi)[idx].ad=val;save();const chk=document.getElementById(`chk-${di}-${mi}`);if(chk&&!getState().meals[`${di}-${mi}`])chk.className='meal-check '+(canCheck(di,mi)?'ready':'locked');}
+function yDegis(di,mi,idx,val){getY(di,mi)[idx].ad=val;const chk=document.getElementById(`chk-${di}-${mi}`);if(chk&&!getState().meals[`${di}-${mi}`])chk.className='meal-check '+(canCheck(di,mi)?'ready':'locked');}
 function yBlur(di,mi,idx,val){
   if(!val.trim())return;
   getY(di,mi)[idx].ad=val;
